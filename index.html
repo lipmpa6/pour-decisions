@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pour Decisions 🍹</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --lime: #c8f135;
+      --coral: #ff6b6b;
+      --gold: #ffd166;
+      --teal: #06d6a0;
+      --navy: #1a1a2e;
+      --navy2: #16213e;
+      --card: #0f3460;
+      --text: #f0f0f0;
+      --muted: #a0aec0;
+      --border: rgba(255,255,255,0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(ellipse at 20% 50%, rgba(6,214,160,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(255,107,107,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 80%, rgba(255,209,102,0.06) 0%, transparent 50%);
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      padding: 2.5rem 1rem 1.5rem;
+      position: relative;
+    }
+
+    .logo {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      background: linear-gradient(135deg, var(--lime) 0%, var(--teal) 40%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      filter: drop-shadow(0 2px 12px rgba(200,241,53,0.3));
+    }
+
+    .tagline {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    /* NAV TABS */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 1rem 0;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      padding: 0.55rem 1.4rem;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover { border-color: var(--lime); color: var(--lime); }
+    .tab-btn.active { background: var(--lime); border-color: var(--lime); color: var(--navy); font-weight: 700; }
+
+    /* MAIN CONTENT */
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h2 {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    /* LEADERBOARD */
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      margin-bottom: 0.6rem;
+      border: 1px solid var(--border);
+      transition: transform 0.15s;
+    }
+
+    .leaderboard-item:hover { transform: translateX(4px); }
+
+    .rank {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.4rem;
+      min-width: 2rem;
+      text-align: center;
+    }
+
+    .rank-1 { color: var(--gold); }
+    .rank-2 { color: var(--muted); }
+    .rank-3 { color: #cd7f32; }
+
+    .lb-names { flex: 1; }
+    .lb-pair { font-weight: 700; font-size: 1rem; }
+    .lb-detail { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+
+    .lb-drinks {
+      text-align: right;
+    }
+
+    .lb-count {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.5rem;
+    }
+
+    .lb-count.positive { color: var(--coral); }
+    .lb-count.negative { color: var(--teal); }
+    .lb-count.zero { color: var(--muted); }
+
+    .lb-label { font-size: 0.75rem; color: var(--muted); }
+
+    /* DRINK EMOJI badge */
+    .drink-badge {
+      font-size: 1.4rem;
+      min-width: 2.2rem;
+      text-align: center;
+    }
+
+    /* FORM STYLES */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--lime);
+    }
+
+    input, select, textarea {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.65rem 0.9rem;
+      transition: border-color 0.2s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus { border-color: var(--lime); }
+
+    select option { background: var(--navy2); }
+
+    /* BUTTONS */
+    .btn {
+      padding: 0.7rem 1.5rem;
+      border-radius: 999px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--lime), var(--teal));
+      color: var(--navy);
+      width: 100%;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      padding: 0.85rem;
+    }
+
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6,214,160,0.3); }
+
+    .btn-danger {
+      background: rgba(255,107,107,0.15);
+      color: var(--coral);
+      border: 1px solid rgba(255,107,107,0.3);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.7rem;
+    }
+
+    .btn-danger:hover { background: rgba(255,107,107,0.3); }
+
+    /* DEBT LIST */
+    .debt-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .debt-info { flex: 1; font-size: 0.9rem; }
+    .debt-info strong { color: var(--gold); }
+    .debt-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+
+    /* DRINK CHIPS */
+    .drink-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.8rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip:hover { border-color: var(--gold); color: var(--gold); }
+    .chip.selected { background: var(--gold); color: var(--navy); border-color: var(--gold); font-weight: 700; }
+    .chip.reason-chip:hover { border-color: var(--coral); color: var(--coral); }
+    .chip.reason-chip.selected { background: var(--coral); color: #fff; border-color: var(--coral); }
+
+    /* SECTION HEADER */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin: 0;
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.1rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+    }
+
+    .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.2rem; }
+
+    /* EMPTY STATE */
+    .empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty .emoji { font-size: 3rem; margin-bottom: 0.75rem; }
+    .empty p { font-size: 0.95rem; }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--lime);
+      color: var(--navy);
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      white-space: nowrap;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.25rem 0;
+    }
+
+    /* SYNC STATUS */
+    #sync-status {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .sync-dot.synced { background: var(--teal); }
+    .sync-dot.syncing { background: var(--gold); animation: pulse 1s infinite; }
+    .sync-dot.error { background: var(--coral); }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .modal h3 {
+      font-family: 'Pacifico', cursive;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 0.7rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 999px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .quantity-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+
+    .qty-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      border: 2px solid var(--lime);
+      background: transparent;
+      color: var(--lime);
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .qty-btn:hover { background: var(--lime); color: var(--navy); }
+
+    .qty-display {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.5rem;
+      min-width: 3rem;
+      text-align: center;
+      color: var(--lime);
+    }
+
+    /* CONFIG panel */
+    #config-panel {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 600;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #config-panel.open { display: flex; }
+
+    .config-box {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .config-box h3 { font-family: 'Pacifico', cursive; color: var(--teal); margin-bottom: 0.3rem; }
+    .config-box p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+
+    .settings-icon {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 100;
+    }
+
+    .settings-icon:hover { color: var(--lime); border-color: var(--lime); }
+
+  </style>
+</head>
+<body>
+
+<div id="sync-status">
+  <div class="sync-dot" id="sync-dot"></div>
+  <span id="sync-text">local</span>
+</div>
+
+<header>
+  <div class="logo">Pour Decisions 🍹</div>
+  <div class="tagline">Track your tabs. Own your chaos.</div>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('leaderboard')">🏆 Leaderboard</button>
+  <button class="tab-btn" onclick="showTab('add')">➕ Add Debt</button>
+  <button class="tab-btn" onclick="showTab('history')">📜 History</button>
+  <button class="tab-btn" onclick="showTab('drinks')">🍸 Menu & Reasons</button>
+</nav>
+
+<main>
+
+  <!-- LEADERBOARD TAB -->
+  <div class="tab-panel active" id="tab-leaderboard">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number" id="stat-total" style="color:var(--coral)">0</div>
+        <div class="stat-label">Total Debts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-people" style="color:var(--teal)">0</div>
+        <div class="stat-label">People</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-drinks-total" style="color:var(--gold)">0</div>
+        <div class="stat-label">Drinks Owed</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <h2>🏆 Who Owes Who</h2>
+      </div>
+      <div id="leaderboard-list">
+        <div class="empty">
+          <div class="emoji">🍹</div>
+          <p>No debts yet! Add one to get started.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <h2>💬 Costly Reasons</h2>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem">Which reasons have racked up the most drinks?</p>
+      <div id="reasons-leaderboard">
+        <div class="empty"><div class="emoji">🤔</div><p>No reasons tracked yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD DEBT TAB -->
+  <div class="tab-panel" id="tab-add">
+    <div class="card">
+      <h2>➕ Log a Drink Debt</h2>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Who owes?</label>
+          <input type="text" id="from-person" placeholder="e.g. Phil" list="people-list" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Who to?</label>
+          <input type="text" id="to-person" placeholder="e.g. Jess" list="people-list" autocomplete="off" />
+        </div>
+      </div>
+
+      <datalist id="people-list"></datalist>
+
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Pick a Drink</label>
+        <div class="drink-chips" id="drink-chips"></div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Or type a custom drink</label>
+        <input type="text" id="custom-drink-input" placeholder="e.g. Frosé" />
+      </div>
+
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Why do they owe? <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional but fun)</span></label>
+        <div class="drink-chips" id="reason-chips"></div>
+        <input type="text" id="custom-reason-input" placeholder="Or type a new reason — it'll be saved for next time" style="margin-top:0.5rem" />
+      </div>
+
+      <hr class="divider" />
+
+      <label>How many?</label>
+      <div class="quantity-row">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <div class="qty-display" id="qty-display">1</div>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+
+      <button class="btn btn-primary" onclick="addDebt()">🍺 Log the Debt</button>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div class="tab-panel" id="tab-history">
+    <div class="card">
+      <div class="section-header">
+        <h2>📜 All Debts</h2>
+        <span style="font-size:0.8rem;color:var(--muted)" id="history-count"></span>
+      </div>
+      <div id="history-list">
+        <div class="empty"><div class="emoji">📭</div><p>Nothing logged yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRINKS & REASONS TAB -->
+  <div class="tab-panel" id="tab-drinks">
+    <div class="card">
+      <h2>🍸 Drink Menu</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">These drinks appear as quick-picks when adding a debt. Add your own!</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Drink name</label>
+          <input type="text" id="new-drink-name" placeholder="e.g. Aperol Spritz" />
+        </div>
+        <div class="form-group">
+          <label>Emoji</label>
+          <input type="text" id="new-drink-emoji" placeholder="🍊" maxlength="2" />
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addDrink()">Add to Menu</button>
+
+      <hr class="divider" />
+      <div id="drinks-list"></div>
+    </div>
+
+    <div class="card">
+      <h2>💬 Reasons</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">Pre-set reasons for owing drinks — projects, mistakes, bets, anything. Pick one when logging a debt.</p>
+
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>New reason</label>
+        <input type="text" id="new-reason-name" placeholder="e.g. Project Phoenix, Called it wrong, Lost the bet" />
+      </div>
+      <button class="btn btn-primary" onclick="addReason()">Add Reason</button>
+
+      <hr class="divider" />
+      <div id="reasons-list"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ADD DEBT CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3>🍹 Confirm Debt</h3>
+    <p id="confirm-text" style="margin-bottom:0.5rem;color:var(--muted)"></p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1;margin:0" onclick="confirmDebt()">Log it!</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS / CONFIG -->
+<div id="config-panel">
+  <div class="config-box">
+    <h3>⚙️ GitHub Sync</h3>
+    <p>Connect to GitHub to keep your data saved and shared across devices.</p>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>GitHub Token (Personal Access Token)</label>
+      <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx" />
+    </div>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Repo Owner (your GitHub username)</label>
+      <input type="text" id="gh-owner" placeholder="lipmpa6" />
+    </div>
+    <div class="form-group" style="margin-bottom:0.75rem">
+      <label>Repo Name</label>
+      <input type="text" id="gh-repo" placeholder="pour-decisions-data" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeConfig()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1;margin:0" onclick="saveConfig()">Save & Connect</button>
+    </div>
+  </div>
+</div>
+
+<button class="settings-icon" onclick="openConfig()" title="GitHub Sync Settings">⚙️</button>
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA & STATE
+// ═══════════════════════════════════════════════
+const DEFAULT_DRINKS = [
+  { name: 'Beer', emoji: '🍺' },
+  { name: 'Red Wine', emoji: '🍷' },
+  { name: 'White Wine', emoji: '🥂' },
+  { name: 'Margarita', emoji: '🍹' },
+  { name: 'Espresso Martini', emoji: '☕' },
+  { name: 'Old Fashioned', emoji: '🥃' },
+  { name: 'Negroni', emoji: '🍊' },
+  { name: 'NA Cocktail', emoji: '🌿' },
+  { name: 'Champagne', emoji: '🍾' },
+  { name: 'Whiskey', emoji: '🥃' },
+];
+
+const DEFAULT_REASONS = [
+  'Lost a bet',
+  'Called it wrong',
+  'Pure generosity',
+  'They were right',
+  'Made a mistake',
+];
+
+let state = {
+  debts: [],
+  drinks: [...DEFAULT_DRINKS],
+  reasons: [...DEFAULT_REASONS],
+};
+
+let ghConfig = JSON.parse(localStorage.getItem('pd_gh_config') || 'null');
+let selectedDrink = null;
+let selectedReason = null;
+let quantity = 1;
+let pendingDebt = null;
+let ghFileSha = null;
+
+// ═══════════════════════════════════════════════
+//  GITHUB SYNC
+// ═══════════════════════════════════════════════
+function ghHeaders() {
+  return {
+    'Authorization': `token ${ghConfig.token}`,
+    'Content-Type': 'application/json',
+    'Accept': 'application/vnd.github+json'
+  };
+}
+
+function ghUrl() {
+  return `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/data.json`;
+}
+
+async function loadFromGitHub() {
+  if (!ghConfig) return;
+  setSyncStatus('syncing', 'syncing…');
+  try {
+    const res = await fetch(ghUrl(), { headers: ghHeaders() });
+    if (res.status === 404) {
+      // File doesn't exist yet — we'll create it on first save
+      setSyncStatus('synced', 'connected');
+      return;
+    }
+    const json = await res.json();
+    ghFileSha = json.sha;
+    const data = JSON.parse(atob(json.content.replace(/\n/g, '')));
+    state = data;
+    // Make sure default drinks are merged in
+    DEFAULT_DRINKS.forEach(d => {
+      if (!state.drinks.find(x => x.name === d.name)) state.drinks.unshift(d);
+    });
+    // Make sure default reasons are merged in
+    if (!state.reasons) state.reasons = [];
+    DEFAULT_REASONS.forEach(r => {
+      if (!state.reasons.includes(r)) state.reasons.unshift(r);
+    });
+    renderAll();
+    setSyncStatus('synced', 'synced ✓');
+  } catch (e) {
+    setSyncStatus('error', 'sync error');
+    console.error(e);
+  }
+}
+
+async function saveToGitHub() {
+  if (!ghConfig) {
+    // Save locally as fallback
+    localStorage.setItem('pd_local', JSON.stringify(state));
+    return;
+  }
+  setSyncStatus('syncing', 'saving…');
+  try {
+    const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
+    const body = {
+      message: 'Update Pour Decisions data',
+      content,
+    };
+    if (ghFileSha) body.sha = ghFileSha;
+
+    const res = await fetch(ghUrl(), {
+      method: 'PUT',
+      headers: ghHeaders(),
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) throw new Error(await res.text());
+    const json = await res.json();
+    ghFileSha = json.content.sha;
+    setSyncStatus('synced', 'saved ✓');
+  } catch (e) {
+    setSyncStatus('error', 'save failed');
+    console.error(e);
+    toast('⚠️ Save failed — check settings');
+  }
+}
+
+function setSyncStatus(state, text) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-text');
+  dot.className = 'sync-dot ' + state;
+  label.textContent = text;
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+function renderAll() {
+  renderLeaderboard();
+  renderHistory();
+  renderDrinks();
+  renderReasons();
+  renderDrinkChips();
+  renderReasonChips();
+  renderPeopleList();
+}
+
+function pairKey(a, b) {
+  return [a, b].sort().join('|');
+}
+
+function computeNetDebts() {
+  // Returns map of pairKey -> { from, to, count, drinks }
+  const map = {};
+  state.debts.forEach(d => {
+    const key = pairKey(d.from, d.to);
+    if (!map[key]) map[key] = {};
+    const drinkKey = d.drink;
+    if (!map[key][drinkKey]) map[key][drinkKey] = 0;
+    // Positive = d.from owes the first-sorted person
+    const [a] = [d.from, d.to].sort();
+    const sign = d.from === a ? 1 : -1;
+    map[key][drinkKey] += sign * d.qty;
+  });
+  return map;
+}
+
+function renderLeaderboard() {
+  const netMap = computeNetDebts();
+  const entries = [];
+
+  Object.keys(netMap).forEach(key => {
+    const [a, b] = key.split('|');
+    const drinks = netMap[key];
+    let totalNet = 0;
+    const drinkSummary = [];
+
+    Object.keys(drinks).forEach(drinkName => {
+      const net = drinks[drinkName];
+      totalNet += Math.abs(net);
+      if (net !== 0) {
+        const ower = net > 0 ? a : b;
+        const owee = net > 0 ? b : a;
+        drinkSummary.push(`${ower} → ${owee}: ${Math.abs(net)} ${drinkName}`);
+      }    });
+
+    if (totalNet > 0) {
+      entries.push({ key, a, b, totalNet, drinkSummary, drinks });
+    }
+  });
+
+  entries.sort((x, y) => y.totalNet - x.totalNet);
+
+  const list = document.getElementById('leaderboard-list');
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="emoji">🍹</div><p>No outstanding debts! You're all square. 🎉</p></div>`;
+    document.getElementById('stat-total').textContent = 0;
+    document.getElementById('stat-people').textContent = 0;
+    document.getElementById('stat-drinks-total').textContent = 0;
+    return;
+  }
+
+  let totalDrinks = 0;
+  const people = new Set();
+  state.debts.forEach(d => { people.add(d.from); people.add(d.to); totalDrinks += d.qty; });
+
+  document.getElementById('stat-total').textContent = state.debts.length;
+  document.getElementById('stat-people').textContent = people.size;
+  document.getElementById('stat-drinks-total').textContent = totalDrinks;
+
+  list.innerHTML = entries.map((e, i) => {
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+    const rankSymbol = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+    const detail = e.drinkSummary.join(' · ');
+    return `
+      <div class="leaderboard-item">
+        <div class="rank ${rankClass}">${rankSymbol}</div>
+        <div class="lb-names">
+          <div class="lb-pair">${e.a} ↔ ${e.b}</div>
+          <div class="lb-detail">${detail}</div>
+        </div>
+        <div class="lb-drinks">
+          <div class="lb-count positive">${e.totalNet}</div>
+          <div class="lb-label">net drinks</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  document.getElementById('history-count').textContent = `${state.debts.length} entries`;
+
+  if (state.debts.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="emoji">📭</div><p>Nothing logged yet.</p></div>`;
+    return;
+  }
+
+  const sorted = [...state.debts].reverse();
+  list.innerHTML = sorted.map((d, i) => {
+    const realIndex = state.debts.length - 1 - i;
+    const drinkObj = state.drinks.find(x => x.name === d.drink);
+    const emoji = drinkObj ? drinkObj.emoji : '🍹';
+    const date = new Date(d.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return `
+      <div class="debt-item">
+        <div class="drink-badge">${emoji}</div>
+        <div class="debt-info">
+          <strong>${d.from}</strong> owes <strong>${d.to}</strong>
+          <div class="debt-meta">${d.qty}× ${d.drink} · ${date}${d.reason ? ` · 💬 "${d.reason}"` : ''}</div>
+        </div>
+        <button class="btn btn-danger" onclick="removeDebt(${realIndex})">✕</button>
+      </div>`;
+  }).join('');
+}
+
+function renderDrinks() {
+  const list = document.getElementById('drinks-list');
+  list.innerHTML = state.drinks.map((d, i) => `
+    <div class="debt-item">
+      <div class="drink-badge">${d.emoji}</div>
+      <div class="debt-info"><strong>${d.name}</strong></div>
+      ${i >= DEFAULT_DRINKS.length ? `<button class="btn btn-danger" onclick="removeDrink(${i})">✕</button>` : ''}
+    </div>`).join('');
+}
+
+function renderDrinkChips() {
+  const chips = document.getElementById('drink-chips');
+  chips.innerHTML = state.drinks.map(d => `
+    <div class="chip ${selectedDrink === d.name ? 'selected' : ''}" onclick="selectDrink('${d.name.replace(/'/g,"\\'")}')">
+      ${d.emoji} ${d.name}
+    </div>`).join('');
+}
+
+function renderReasonChips() {
+  const chips = document.getElementById('reason-chips');
+  if (!chips) return;
+  chips.innerHTML = state.reasons.map(r => `
+    <div class="chip reason-chip ${selectedReason === r ? 'selected' : ''}" onclick="selectReason('${r.replace(/'/g,"\\'")}')">
+      💬 ${r}
+    </div>`).join('');
+}
+
+function renderReasons() {
+  // Management list in the drinks/reasons tab
+  const list = document.getElementById('reasons-list');
+  if (!list) return;
+  if (state.reasons.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="emoji">🤷</div><p>No reasons yet. Add one above!</p></div>`;
+  } else {
+    list.innerHTML = state.reasons.map((r, i) => {
+      const total = state.debts.filter(d => d.reason === r).reduce((sum, d) => sum + d.qty, 0);
+      const isDefault = DEFAULT_REASONS.includes(r);
+      return `
+        <div class="debt-item">
+          <div class="drink-badge">💬</div>
+          <div class="debt-info">
+            <strong>${r}</strong>
+            <div class="debt-meta">${total} drink${total !== 1 ? 's' : ''} owed because of this</div>
+          </div>
+          ${!isDefault ? `<button class="btn btn-danger" onclick="removeReason(${i})">✕</button>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  // Leaderboard section on main tab
+  const lb = document.getElementById('reasons-leaderboard');
+  if (!lb) return;
+  const totals = state.reasons.map(r => ({
+    reason: r,
+    total: state.debts.filter(d => d.reason === r).reduce((sum, d) => sum + d.qty, 0)
+  })).filter(x => x.total > 0).sort((a,b) => b.total - a.total);
+
+  if (totals.length === 0) {
+    lb.innerHTML = `<div class="empty"><div class="emoji">🤔</div><p>No reasons tracked yet.</p></div>`;
+    return;
+  }
+
+  lb.innerHTML = totals.map((item, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+    return `
+      <div class="leaderboard-item">
+        <div class="rank ${rankClass}">${medal}</div>
+        <div class="lb-names">
+          <div class="lb-pair">💬 ${item.reason}</div>
+        </div>
+        <div class="lb-drinks">
+          <div class="lb-count positive">${item.total}</div>
+          <div class="lb-label">drinks owed</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderPeopleList() {
+  const people = new Set();
+  state.debts.forEach(d => { people.add(d.from); people.add(d.to); });
+  const datalist = document.getElementById('people-list');
+  datalist.innerHTML = [...people].map(p => `<option value="${p}">`).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════
+function selectDrink(name) {
+  selectedDrink = selectedDrink === name ? null : name;
+  document.getElementById('custom-drink-input').value = '';
+  renderDrinkChips();
+}
+
+function selectReason(name) {
+  selectedReason = selectedReason === name ? null : name;
+  document.getElementById('custom-reason-input').value = '';
+  renderReasonChips();
+}
+
+function changeQty(delta) {
+  quantity = Math.max(1, quantity + delta);
+  document.getElementById('qty-display').textContent = quantity;
+}
+
+function addDebt() {
+  const from = document.getElementById('from-person').value.trim();
+  const to = document.getElementById('to-person').value.trim();
+  const customDrink = document.getElementById('custom-drink-input').value.trim();
+  const drink = customDrink || selectedDrink;
+
+  if (!from) return toast('Who owes the drink?');
+  if (!to) return toast('Who are they owed to?');
+  if (from.toLowerCase() === to.toLowerCase()) return toast('Same person can\'t owe themselves!');
+  if (!drink) return toast('Pick a drink!');
+
+  const customReason = document.getElementById('custom-reason-input').value.trim();
+  const reason = customReason || selectedReason || '';
+  pendingDebt = { from, to, drink, qty: quantity, reason, timestamp: Date.now() };
+
+  const drinkObj = state.drinks.find(x => x.name === drink);
+  const emoji = drinkObj ? drinkObj.emoji : '🍹';
+  const reasonText = reason ? ` · 💬 "${reason}"` : '';
+  document.getElementById('confirm-text').textContent =
+    `${from} owes ${to}  ${quantity}× ${emoji} ${drink}${reasonText}`;
+
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+async function confirmDebt() {
+  // If it was a custom drink, save it to drinks list
+  const customDrink = document.getElementById('custom-drink-input').value.trim();
+  if (customDrink && !state.drinks.find(x => x.name === customDrink)) {
+    state.drinks.push({ name: customDrink, emoji: '🍹' });
+  }
+
+  // If it was a custom reason, save it to reasons list
+  const customReason = document.getElementById('custom-reason-input').value.trim();
+  if (customReason && !state.reasons.includes(customReason)) {
+    state.reasons.push(customReason);
+  }
+
+  state.debts.push(pendingDebt);
+  closeModal();
+
+  // Reset form
+  document.getElementById('from-person').value = '';
+  document.getElementById('to-person').value = '';
+  document.getElementById('custom-drink-input').value = '';
+  document.getElementById('custom-reason-input').value = '';
+  selectedDrink = null;
+  selectedReason = null;
+  quantity = 1;
+  document.getElementById('qty-display').textContent = '1';
+
+  renderAll();
+  await saveToGitHub();
+  toast('🍺 Debt logged!');
+  showTab('leaderboard');
+}
+
+async function removeDebt(index) {
+  state.debts.splice(index, 1);
+  renderAll();
+  await saveToGitHub();
+  toast('Debt removed');
+}
+
+function addDrink() {  const name = document.getElementById('new-drink-name').value.trim();
+  const emoji = document.getElementById('new-drink-emoji').value.trim() || '🍹';
+  if (!name) return toast('Enter a drink name!');
+  if (state.drinks.find(x => x.name.toLowerCase() === name.toLowerCase())) return toast('Already on the menu!');
+  state.drinks.push({ name, emoji });
+  document.getElementById('new-drink-name').value = '';
+  document.getElementById('new-drink-emoji').value = '';
+  renderAll();
+  saveToGitHub();
+  toast(`${emoji} ${name} added to the menu!`);
+}
+
+async function removeDrink(index) {
+  state.drinks.splice(index, 1);
+  renderAll();
+  await saveToGitHub();
+  toast('Drink removed');
+}
+
+function addReason() {
+  const name = document.getElementById('new-reason-name').value.trim();
+  if (!name) return toast('Enter a reason!');
+  if (state.reasons.includes(name)) return toast('Already on the list!');
+  state.reasons.push(name);
+  document.getElementById('new-reason-name').value = '';
+  renderAll();
+  saveToGitHub();
+  toast(`💬 "${name}" added!`);
+}
+
+async function removeReason(index) {
+  state.reasons.splice(index, 1);
+  renderAll();
+  await saveToGitHub();
+  toast('Reason removed');
+}
+
+// ═══════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick').includes(name)) b.classList.add('active');
+  });
+  if (name === 'add') { renderDrinkChips(); renderReasonChips(); }
+}
+
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  pendingDebt = null;
+}
+
+function openConfig() { document.getElementById('config-panel').classList.add('open'); loadConfigForm(); }
+function closeConfig() { document.getElementById('config-panel').classList.remove('open'); }
+
+function loadConfigForm() {
+  if (ghConfig) {
+    document.getElementById('gh-token').value = ghConfig.token;
+    document.getElementById('gh-owner').value = ghConfig.owner;
+    document.getElementById('gh-repo').value = ghConfig.repo;
+  }
+}
+
+function saveConfig() {
+  const token = document.getElementById('gh-token').value.trim();
+  const owner = document.getElementById('gh-owner').value.trim();
+  const repo = document.getElementById('gh-repo').value.trim();
+  if (!token || !owner || !repo) return toast('Fill all fields!');
+  ghConfig = { token, owner, repo };
+  localStorage.setItem('pd_gh_config', JSON.stringify(ghConfig));
+  closeConfig();
+  toast('⚙️ Config saved! Loading data…');
+  loadFromGitHub();
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function init() {
+  // Try to load local fallback first
+  const local = localStorage.getItem('pd_local');
+  if (local) {
+    try { state = JSON.parse(local); } catch(e) {}
+  }
+
+  renderAll();
+
+  if (ghConfig) {
+    loadFromGitHub();
+  } else {
+    setSyncStatus('', 'no sync — tap ⚙️');
+  }
+}
+
+init();
+</script>
+</body>
+</html>
