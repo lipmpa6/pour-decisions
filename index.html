@@ -269,6 +269,32 @@
     .chip.reason-chip:hover { border-color: var(--coral); color: var(--coral); }
     .chip.reason-chip.selected { background: var(--coral); color: #fff; border-color: var(--coral); }
 
+    .to-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--teal);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .to-tag button {
+      background: none;
+      border: none;
+      color: var(--navy);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0;
+      line-height: 1;
+      opacity: 0.7;
+    }
+
+    .to-tag button:hover { opacity: 1; }
+
     /* SECTION HEADER */
     .section-header {
       display: flex;
@@ -570,8 +596,12 @@
           <input type="text" id="from-person" placeholder="e.g. Phil" list="people-list" autocomplete="off" />
         </div>
         <div class="form-group">
-          <label>Who to?</label>
-          <input type="text" id="to-person" placeholder="e.g. Jess" list="people-list" autocomplete="off" />
+          <label>Who to? <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(add multiple)</span></label>
+          <div id="to-tags" style="display:flex;flex-wrap:wrap;gap:0.35rem;min-height:2.5rem;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:10px;padding:0.4rem 0.6rem;align-items:center;cursor:text;" onclick="document.getElementById('to-person-input').focus()">
+            <input type="text" id="to-person-input" placeholder="Type a name, hit Enter" list="people-list" autocomplete="off"
+              style="background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;min-width:140px;flex:1;padding:0.15rem 0;"
+              onkeydown="handleToPersonKey(event)" />
+          </div>
         </div>
       </div>
 
@@ -731,6 +761,7 @@ let state = {
 let ghConfig = JSON.parse(localStorage.getItem('pd_gh_config') || 'null');
 let selectedDrink = null;
 let selectedReason = null;
+let toPersons = [];
 let quantity = 1;
 let pendingDebt = null;
 let ghFileSha = null;
@@ -1048,55 +1079,110 @@ function changeQty(delta) {
   document.getElementById('qty-display').textContent = quantity;
 }
 
+function handleToPersonKey(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,$/, '');
+    if (val) addToPerson(val);
+    e.target.value = '';
+  } else if (e.key === 'Backspace' && e.target.value === '' && toPersons.length > 0) {
+    toPersons.pop();
+    renderToTags();
+  }
+}
+
+function addToPerson(name) {
+  if (!name) return;
+  if (toPersons.map(p => p.toLowerCase()).includes(name.toLowerCase())) return;
+  toPersons.push(name);
+  renderToTags();
+}
+
+function removeToPerson(index) {
+  toPersons.splice(index, 1);
+  renderToTags();
+}
+
+function renderToTags() {
+  const container = document.getElementById('to-tags');
+  const input = document.getElementById('to-person-input');
+  // Remove existing tags (keep the input)
+  container.querySelectorAll('.to-tag').forEach(t => t.remove());
+  // Insert tags before the input
+  toPersons.forEach((name, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'to-tag';
+    tag.innerHTML = `${name} <button onclick="removeToPerson(${i})">✕</button>`;
+    container.insertBefore(tag, input);
+  });
+  input.placeholder = toPersons.length > 0 ? 'Add another…' : 'Type a name, hit Enter';
+}
+
 function addDebt() {
   const from = document.getElementById('from-person').value.trim();
-  const to = document.getElementById('to-person').value.trim();
+
+  // Also check if there's an unsubmitted name in the input box
+  const rawInput = document.getElementById('to-person-input').value.trim();
+  if (rawInput) addToPerson(rawInput);
+  document.getElementById('to-person-input').value = '';
+
   const customDrink = document.getElementById('custom-drink-input').value.trim();
   const drink = customDrink || selectedDrink;
 
   if (!from) return toast('Who owes the drink?');
-  if (!to) return toast('Who are they owed to?');
-  if (from.toLowerCase() === to.toLowerCase()) return toast('Same person can\'t owe themselves!');
+  if (toPersons.length === 0) return toast('Who are they owed to?');
+  if (toPersons.map(p => p.toLowerCase()).includes(from.toLowerCase())) return toast('Can\'t owe yourself!');
   if (!drink) return toast('Pick a drink!');
 
   const customReason = document.getElementById('custom-reason-input').value.trim();
   const reason = customReason || selectedReason || '';
-  pendingDebt = { from, to, drink, qty: quantity, reason, timestamp: Date.now() };
+
+  // Build one pending debt per person
+  pendingDebt = toPersons.map(to => ({ from, to, drink, qty: quantity, reason, timestamp: Date.now() }));
 
   const drinkObj = state.drinks.find(x => x.name === drink);
   const emoji = drinkObj ? drinkObj.emoji : '🍹';
   const reasonText = reason ? ` · 💬 "${reason}"` : '';
+  const toList = toPersons.join(', ');
   document.getElementById('confirm-text').textContent =
-    `${from} owes ${to}  ${quantity}× ${emoji} ${drink}${reasonText}`;
+    `${from} owes ${toList}  ${quantity}× ${emoji} ${drink} each${reasonText}`;
 
   document.getElementById('confirm-modal').classList.add('open');
 }
 
 async function confirmDebt() {
-  // If it was a custom drink, save it to drinks list
   const customDrink = document.getElementById('custom-drink-input').value.trim();
   if (customDrink && !state.drinks.find(x => x.name === customDrink)) {
     state.drinks.push({ name: customDrink, emoji: '🍹' });
   }
 
-  // If it was a custom reason, save it to reasons list
   const customReason = document.getElementById('custom-reason-input').value.trim();
   if (customReason && !state.reasons.includes(customReason)) {
     state.reasons.push(customReason);
   }
 
-  state.debts.push(pendingDebt);
+  // Push one debt entry per person
+  pendingDebt.forEach(d => state.debts.push(d));
   closeModal();
 
   // Reset form
   document.getElementById('from-person').value = '';
-  document.getElementById('to-person').value = '';
+  document.getElementById('to-person-input').value = '';
   document.getElementById('custom-drink-input').value = '';
   document.getElementById('custom-reason-input').value = '';
+  toPersons = [];
+  renderToTags();
   selectedDrink = null;
   selectedReason = null;
   quantity = 1;
   document.getElementById('qty-display').textContent = '1';
+
+  renderAll();
+  await saveToGitHub();
+  const count = pendingDebt.length;
+  toast(`🍺 ${count > 1 ? count + ' debts' : 'Debt'} logged!`);
+  showTab('leaderboard');
+}
 
   renderAll();
   await saveToGitHub();
