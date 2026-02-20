@@ -893,6 +893,8 @@ function renderLeaderboard() {
     const drinks = netMap[key];
     let totalNet = 0;
     const drinkSummary = [];
+    let netOwer = null;
+    let netOwee = null;
 
     Object.keys(drinks).forEach(drinkName => {
       const net = drinks[drinkName];
@@ -900,11 +902,14 @@ function renderLeaderboard() {
       if (net !== 0) {
         const ower = net > 0 ? a : b;
         const owee = net > 0 ? b : a;
-        drinkSummary.push(`${ower} → ${owee}: ${Math.abs(net)} ${drinkName}`);
-      }    });
+        // Track the dominant direction for the headline
+        if (!netOwer) { netOwer = ower; netOwee = owee; }
+        drinkSummary.push(`${Math.abs(net)} ${drinkName}`);
+      }
+    });
 
     if (totalNet > 0) {
-      entries.push({ key, a, b, totalNet, drinkSummary, drinks });
+      entries.push({ key, a, b, totalNet, drinkSummary, drinks, netOwer, netOwee });
     }
   });
 
@@ -935,7 +940,7 @@ function renderLeaderboard() {
       <div class="leaderboard-item">
         <div class="rank ${rankClass}">${rankSymbol}</div>
         <div class="lb-names">
-          <div class="lb-pair">${e.a} ↔ ${e.b}</div>
+          <div class="lb-pair"><span style="color:var(--coral)">${e.netOwer}</span> owes <span style="color:var(--teal)">${e.netOwee}</span></div>
           <div class="lb-detail">${detail}</div>
         </div>
         <div class="lb-drinks">
