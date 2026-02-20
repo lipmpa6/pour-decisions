@@ -700,31 +700,20 @@
   </div>
 </div>
 
-<!-- SETTINGS / CONFIG -->
-<div id="config-panel">
-  <div class="config-box">
-    <h3>⚙️ GitHub Sync</h3>
-    <p>Connect to GitHub to keep your data saved and shared across devices.</p>
-    <div class="form-group" style="margin-bottom:0.75rem">
-      <label>GitHub Token (Personal Access Token)</label>
-      <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx" />
+<!-- PASSWORD SCREEN -->
+<div id="password-screen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
+  <div style="width:100%;max-width:380px;text-align:center;">
+    <div style="font-family:'Pacifico',cursive;font-size:2.5rem;background:linear-gradient(135deg,var(--lime),var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;">Pour Decisions 🍹</div>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:2rem;">Enter the password to access the tab</p>
+    <div class="form-group" style="margin-bottom:1rem;text-align:left;">
+      <label>Password</label>
+      <input type="password" id="pw-input" placeholder="Enter password…" onkeydown="if(event.key==='Enter')checkPassword()" />
     </div>
-    <div class="form-group" style="margin-bottom:0.75rem">
-      <label>Repo Owner (your GitHub username)</label>
-      <input type="text" id="gh-owner" placeholder="lipmpa6" />
-    </div>
-    <div class="form-group" style="margin-bottom:0.75rem">
-      <label>Repo Name</label>
-      <input type="text" id="gh-repo" placeholder="pour-decisions-data" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeConfig()">Cancel</button>
-      <button class="btn btn-primary" style="flex:1;margin:0" onclick="saveConfig()">Save & Connect</button>
-    </div>
+    <button class="btn btn-primary" onclick="checkPassword()">🍺 Enter the Bar</button>
+    <p id="pw-error" style="color:var(--coral);font-size:0.85rem;margin-top:0.75rem;display:none;">Wrong password — try again!</p>
   </div>
 </div>
 
-<button class="settings-icon" onclick="openConfig()" title="GitHub Sync Settings">⚙️</button>
 <div id="toast"></div>
 
 <script>
@@ -758,7 +747,8 @@ let state = {
   reasons: [...DEFAULT_REASONS],
 };
 
-let ghConfig = JSON.parse(localStorage.getItem('pd_gh_config') || 'null');
+let ghConfig = null; // no longer needed client-side
+let appPassword = localStorage.getItem('pd_password') || null;
 let selectedDrink = null;
 let selectedReason = null;
 let toPersons = [];
@@ -767,43 +757,54 @@ let pendingDebt = null;
 let ghFileSha = null;
 
 // ═══════════════════════════════════════════════
-//  GITHUB SYNC
+//  PASSWORD
 // ═══════════════════════════════════════════════
-function ghHeaders() {
-  return {
-    'Authorization': `token ${ghConfig.token}`,
-    'Content-Type': 'application/json',
-    'Accept': 'application/vnd.github+json'
-  };
+function checkPassword() {
+  const val = document.getElementById('pw-input').value.trim();
+  if (!val) return;
+  // Test it against the API
+  setSyncStatus('syncing', 'checking…');
+  fetch('/api/save', { headers: { 'x-app-password': val } })
+    .then(r => {
+      if (r.ok || r.status === 200) {
+        appPassword = val;
+        localStorage.setItem('pd_password', val);
+        document.getElementById('password-screen').style.display = 'none';
+        loadFromAPI();
+      } else {
+        document.getElementById('pw-error').style.display = 'block';
+        setSyncStatus('error', 'wrong password');
+      }
+    })
+    .catch(() => {
+      document.getElementById('pw-error').style.display = 'block';
+      setSyncStatus('error', 'error');
+    });
 }
 
-function ghUrl() {
-  return `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/data.json`;
-}
-
-async function loadFromGitHub() {
-  if (!ghConfig) return;
+// ═══════════════════════════════════════════════
+//  API SYNC
+// ═══════════════════════════════════════════════
+async function loadFromAPI() {
   setSyncStatus('syncing', 'syncing…');
   try {
-    const res = await fetch(ghUrl(), { headers: ghHeaders() });
-    if (res.status === 404) {
-      // File doesn't exist yet — we'll create it on first save
-      setSyncStatus('synced', 'connected');
-      return;
-    }
+    const res = await fetch('/api/save', {
+      headers: { 'x-app-password': appPassword }
+    });
+    if (res.status === 401) { showPasswordScreen(); return; }
+    if (!res.ok) throw new Error('Load failed');
     const json = await res.json();
-    ghFileSha = json.sha;
-    const data = JSON.parse(atob(json.content.replace(/\n/g, '')));
-    state = data;
-    // Make sure default drinks are merged in
-    DEFAULT_DRINKS.forEach(d => {
-      if (!state.drinks.find(x => x.name === d.name)) state.drinks.unshift(d);
-    });
-    // Make sure default reasons are merged in
-    if (!state.reasons) state.reasons = [];
-    DEFAULT_REASONS.forEach(r => {
-      if (!state.reasons.includes(r)) state.reasons.unshift(r);
-    });
+    if (json.data) {
+      ghFileSha = json.sha;
+      state = json.data;
+      DEFAULT_DRINKS.forEach(d => {
+        if (!state.drinks.find(x => x.name === d.name)) state.drinks.unshift(d);
+      });
+      if (!state.reasons) state.reasons = [];
+      DEFAULT_REASONS.forEach(r => {
+        if (!state.reasons.includes(r)) state.reasons.unshift(r);
+      });
+    }
     renderAll();
     setSyncStatus('synced', 'synced ✓');
   } catch (e) {
@@ -813,34 +814,25 @@ async function loadFromGitHub() {
 }
 
 async function saveToGitHub() {
-  if (!ghConfig) {
-    // Save locally as fallback
-    localStorage.setItem('pd_local', JSON.stringify(state));
-    return;
-  }
   setSyncStatus('syncing', 'saving…');
   try {
-    const content = btoa(unescape(encodeURIComponent(JSON.stringify(state, null, 2))));
-    const body = {
-      message: 'Update Pour Decisions data',
-      content,
-    };
-    if (ghFileSha) body.sha = ghFileSha;
-
-    const res = await fetch(ghUrl(), {
+    const res = await fetch('/api/save', {
       method: 'PUT',
-      headers: ghHeaders(),
-      body: JSON.stringify(body)
+      headers: {
+        'Content-Type': 'application/json',
+        'x-app-password': appPassword
+      },
+      body: JSON.stringify({ data: state, sha: ghFileSha })
     });
-
+    if (res.status === 401) { showPasswordScreen(); return; }
     if (!res.ok) throw new Error(await res.text());
     const json = await res.json();
-    ghFileSha = json.content.sha;
+    ghFileSha = json.sha;
     setSyncStatus('synced', 'saved ✓');
   } catch (e) {
     setSyncStatus('error', 'save failed');
     console.error(e);
-    toast('⚠️ Save failed — check settings');
+    toast('⚠️ Save failed');
   }
 }
 
@@ -1246,32 +1238,17 @@ function showTab(name) {
   if (name === 'add') { renderDrinkChips(); renderReasonChips(); }
 }
 
+function showPasswordScreen() {
+  appPassword = null;
+  localStorage.removeItem('pd_password');
+  document.getElementById('password-screen').style.display = 'flex';
+  document.getElementById('pw-error').style.display = 'none';
+  document.getElementById('pw-input').value = '';
+}
+
 function closeModal() {
   document.getElementById('confirm-modal').classList.remove('open');
   pendingDebt = null;
-}
-
-function openConfig() { document.getElementById('config-panel').classList.add('open'); loadConfigForm(); }
-function closeConfig() { document.getElementById('config-panel').classList.remove('open'); }
-
-function loadConfigForm() {
-  if (ghConfig) {
-    document.getElementById('gh-token').value = ghConfig.token;
-    document.getElementById('gh-owner').value = ghConfig.owner;
-    document.getElementById('gh-repo').value = ghConfig.repo;
-  }
-}
-
-function saveConfig() {
-  const token = document.getElementById('gh-token').value.trim();
-  const owner = document.getElementById('gh-owner').value.trim();
-  const repo = document.getElementById('gh-repo').value.trim();
-  if (!token || !owner || !repo) return toast('Fill all fields!');
-  ghConfig = { token, owner, repo };
-  localStorage.setItem('pd_gh_config', JSON.stringify(ghConfig));
-  closeConfig();
-  toast('⚙️ Config saved! Loading data…');
-  loadFromGitHub();
 }
 
 let toastTimer;
@@ -1287,18 +1264,11 @@ function toast(msg) {
 //  INIT
 // ═══════════════════════════════════════════════
 function init() {
-  // Try to load local fallback first
-  const local = localStorage.getItem('pd_local');
-  if (local) {
-    try { state = JSON.parse(local); } catch(e) {}
-  }
-
   renderAll();
-
-  if (ghConfig) {
-    loadFromGitHub();
+  if (appPassword) {
+    loadFromAPI();
   } else {
-    setSyncStatus('', 'no sync — tap ⚙️');
+    showPasswordScreen();
   }
 }
 
