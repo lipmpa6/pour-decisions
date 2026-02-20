@@ -1184,12 +1184,6 @@ async function confirmDebt() {
   showTab('leaderboard');
 }
 
-  renderAll();
-  await saveToGitHub();
-  toast('🍺 Debt logged!');
-  showTab('leaderboard');
-}
-
 async function removeDebt(index) {
   state.debts.splice(index, 1);
   renderAll();
