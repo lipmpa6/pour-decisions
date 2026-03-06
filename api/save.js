@@ -1,15 +1,12 @@
 export default async function handler(req, res) {
-  // Allow requests from anywhere (our app)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-app-password');
 
-  // Handle preflight
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { APP_PASSWORD, GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO } = process.env;
+  const { APP_PASSWORD, GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO, SLACK_WEBHOOK_URL } = process.env;
 
-  // Check password on every request
   const password = req.headers['x-app-password'];
   if (!password || password !== APP_PASSWORD) {
     return res.status(401).json({ error: 'Invalid password' });
@@ -22,7 +19,6 @@ export default async function handler(req, res) {
     'Accept': 'application/vnd.github+json',
   };
 
-  // GET — load data from GitHub
   if (req.method === 'GET') {
     const response = await fetch(ghUrl, { headers: ghHeaders });
     if (response.status === 404) return res.status(200).json({ data: null, sha: null });
@@ -32,9 +28,8 @@ export default async function handler(req, res) {
     return res.status(200).json({ data, sha: json.sha });
   }
 
-  // PUT — save data to GitHub
   if (req.method === 'PUT') {
-    const { data, sha } = req.body;
+    const { data, sha, newDebts } = req.body;
     const content = Buffer.from(JSON.stringify(data, null, 2)).toString('base64');
     const body = { message: 'Update Pour Decisions data', content };
     if (sha) body.sha = sha;
@@ -51,6 +46,19 @@ export default async function handler(req, res) {
     }
 
     const json = await response.json();
+
+    if (SLACK_WEBHOOK_URL && newDebts && newDebts.length > 0) {
+      for (const debt of newDebts) {
+        const reasonText = debt.reason ? ` · 💬 _${debt.reason}_` : '';
+        const message = `🍺 *${debt.from}* owes *${debt.to}* ${debt.qty}× ${debt.drink}${reasonText}`;
+        await fetch(SLACK_WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: message })
+        });
+      }
+    }
+
     return res.status(200).json({ sha: json.content.sha });
   }
 
