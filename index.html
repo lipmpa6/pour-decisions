@@ -1158,8 +1158,11 @@ async function confirmDebt() {
     state.reasons.push(customReason);
   }
 
+  // Save reference BEFORE closeModal nulls it
+  const savedDebts = Array.isArray(pendingDebt) ? [...pendingDebt] : [pendingDebt];
+
   // Push one debt entry per person
-  pendingDebt.forEach(d => state.debts.push(d));
+  savedDebts.forEach(d => state.debts.push(d));
   closeModal();
 
   // Reset form
@@ -1175,7 +1178,6 @@ async function confirmDebt() {
   document.getElementById('qty-display').textContent = '1';
 
   renderAll();
-  const savedDebts = [...pendingDebt];
   await saveToGitHub(savedDebts);
   const count = savedDebts.length;
   toast(`🍺 ${count > 1 ? count + ' debts' : 'Debt'} logged!`);
