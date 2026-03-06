@@ -1,736 +1,1279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sassy Cocktails for Jess 💅</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pour Decisions 🍹</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --lime: #c8f135;
+      --coral: #ff6b6b;
+      --gold: #ffd166;
+      --teal: #06d6a0;
+      --navy: #1a1a2e;
+      --navy2: #16213e;
+      --card: #0f3460;
+      --text: #f0f0f0;
+      --muted: #a0aec0;
+      --border: rgba(255,255,255,0.1);
+    }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .container {
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            max-width: 600px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(ellipse at 20% 50%, rgba(6,214,160,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(255,107,107,0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 60% 80%, rgba(255,209,102,0.06) 0%, transparent 50%);
+    }
 
-        h1 {
-            color: #667eea;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-        }
+    /* HEADER */
+    header {
+      text-align: center;
+      padding: 2.5rem 1rem 1.5rem;
+      position: relative;
+    }
 
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1em;
-        }
+    .logo {
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      background: linear-gradient(135deg, var(--lime) 0%, var(--teal) 40%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+      filter: drop-shadow(0 2px 12px rgba(200,241,53,0.3));
+    }
 
-        .mood-inputs {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
+    .tagline {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 0.4rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
 
-        .input-group {
-            position: relative;
-        }
+    /* NAV TABS */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 1rem 0;
+      flex-wrap: wrap;
+    }
 
-        .input-group label {
-            display: block;
-            color: #667eea;
-            font-weight: 600;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-        }
+    .tab-btn {
+      padding: 0.55rem 1.4rem;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
+    .tab-btn:hover { border-color: var(--lime); color: var(--lime); }
+    .tab-btn.active { background: var(--lime); border-color: var(--lime); color: var(--navy); font-weight: 700; }
 
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+    /* MAIN CONTENT */
+    main {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 1.5rem 1rem 4rem;
+    }
 
-        .find-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.2em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-        .find-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-        }
+    /* CARDS */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
 
-        .find-btn:active {
-            transform: translateY(0);
-        }
+    .card h2 {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
 
-        .result {
-            margin-top: 30px;
-            padding: 25px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 15px;
-            display: none;
-        }
+    /* LEADERBOARD */
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255,255,255,0.04);
+      border-radius: 14px;
+      margin-bottom: 0.6rem;
+      border: 1px solid var(--border);
+      transition: transform 0.15s;
+    }
 
-        .result.show {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
+    .leaderboard-item:hover { transform: translateX(4px); }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .rank {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.4rem;
+      min-width: 2rem;
+      text-align: center;
+    }
 
-        .cocktail-name {
-            color: #667eea;
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 15px;
-            text-align: center;
-        }
+    .rank-1 { color: var(--gold); }
+    .rank-2 { color: var(--muted); }
+    .rank-3 { color: #cd7f32; }
 
-        .cocktail-emoji {
-            text-align: center;
-            font-size: 4em;
-            margin-bottom: 15px;
-        }
+    .lb-names { flex: 1; }
+    .lb-pair { font-weight: 700; font-size: 1rem; }
+    .lb-detail { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
 
-        .mood-match {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
+    .lb-drinks {
+      text-align: right;
+    }
 
-        .mood-match h3 {
-            color: #764ba2;
-            margin-bottom: 10px;
-        }
+    .lb-count {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.5rem;
+    }
 
-        .recipe h3 {
-            color: #764ba2;
-            margin-bottom: 15px;
-        }
+    .lb-count.positive { color: var(--coral); }
+    .lb-count.negative { color: var(--teal); }
+    .lb-count.zero { color: var(--muted); }
 
-        .ingredients, .instructions {
-            background: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-        }
+    .lb-label { font-size: 0.75rem; color: var(--muted); }
 
-        .ingredients h4, .instructions h4 {
-            color: #667eea;
-            margin-bottom: 10px;
-        }
+    /* DRINK EMOJI badge */
+    .drink-badge {
+      font-size: 1.4rem;
+      min-width: 2.2rem;
+      text-align: center;
+    }
 
-        .ingredients ul, .instructions ol {
-            margin-left: 20px;
-            line-height: 1.8;
-        }
+    /* FORM STYLES */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
 
-        .ingredients li, .instructions li {
-            margin-bottom: 5px;
-        }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
 
-        .error {
-            color: #e74c3c;
-            text-align: center;
-            padding: 15px;
-            background: #fde8e8;
-            border-radius: 10px;
-            margin-top: 15px;
-            display: none;
-        }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
 
-        .error.show {
-            display: block;
-        }
-    </style>
+    label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--lime);
+    }
+
+    input, select, textarea {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.65rem 0.9rem;
+      transition: border-color 0.2s;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    input:focus, select:focus { border-color: var(--lime); }
+
+    select option { background: var(--navy2); }
+
+    /* BUTTONS */
+    .btn {
+      padding: 0.7rem 1.5rem;
+      border-radius: 999px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--lime), var(--teal));
+      color: var(--navy);
+      width: 100%;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      padding: 0.85rem;
+    }
+
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6,214,160,0.3); }
+
+    .btn-danger {
+      background: rgba(255,107,107,0.15);
+      color: var(--coral);
+      border: 1px solid rgba(255,107,107,0.3);
+      font-size: 0.8rem;
+      padding: 0.3rem 0.7rem;
+    }
+
+    .btn-danger:hover { background: rgba(255,107,107,0.3); }
+
+    /* DEBT LIST */
+    .debt-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1rem;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      margin-bottom: 0.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .debt-info { flex: 1; font-size: 0.9rem; }
+    .debt-info strong { color: var(--gold); }
+    .debt-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.1rem; }
+
+    /* DRINK CHIPS */
+    .drink-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+
+    .chip {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.3rem 0.8rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .chip:hover { border-color: var(--gold); color: var(--gold); }
+    .chip.selected { background: var(--gold); color: var(--navy); border-color: var(--gold); font-weight: 700; }
+    .chip.reason-chip:hover { border-color: var(--coral); color: var(--coral); }
+    .chip.reason-chip.selected { background: var(--coral); color: #fff; border-color: var(--coral); }
+
+    .to-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--teal);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .to-tag button {
+      background: none;
+      border: none;
+      color: var(--navy);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0;
+      line-height: 1;
+      opacity: 0.7;
+    }
+
+    .to-tag button:hover { opacity: 1; }
+
+    /* SECTION HEADER */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.3rem;
+      color: var(--gold);
+      margin: 0;
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.1rem;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+    }
+
+    .stat-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.2rem; }
+
+    /* EMPTY STATE */
+    .empty {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty .emoji { font-size: 3rem; margin-bottom: 0.75rem; }
+    .empty p { font-size: 0.95rem; }
+
+    /* TOAST */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--lime);
+      color: var(--navy);
+      font-weight: 700;
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      white-space: nowrap;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 1.25rem 0;
+    }
+
+    /* SYNC STATUS */
+    #sync-status {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .sync-dot.synced { background: var(--teal); }
+    .sync-dot.syncing { background: var(--gold); animation: pulse 1s infinite; }
+    .sync-dot.error { background: var(--coral); }
+
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* MODAL */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      z-index: 500;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .modal h3 {
+      font-family: 'Pacifico', cursive;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 0.7rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 999px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .quantity-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+
+    .qty-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      border: 2px solid var(--lime);
+      background: transparent;
+      color: var(--lime);
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .qty-btn:hover { background: var(--lime); color: var(--navy); }
+
+    .qty-display {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.5rem;
+      min-width: 3rem;
+      text-align: center;
+      color: var(--lime);
+    }
+
+    /* CONFIG panel */
+    #config-panel {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      z-index: 600;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    #config-panel.open { display: flex; }
+
+    .config-box {
+      background: var(--navy2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .config-box h3 { font-family: 'Pacifico', cursive; color: var(--teal); margin-bottom: 0.3rem; }
+    .config-box p { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+
+    .settings-icon {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 100;
+    }
+
+    .settings-icon:hover { color: var(--lime); border-color: var(--lime); }
+
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>💅✨ Sassy Cocktails for Jess ✨💅</h1>
-        <p class="subtitle">Tell me how you're feeling in 5 words, I'll find your PERFECT drink 🍸🎉</p>
-        
-        <div class="mood-inputs">
-            <div class="input-group">
-                <label for="mood1">Mood 1</label>
-                <input type="text" id="mood1" placeholder="e.g. energetic">
-            </div>
-            <div class="input-group">
-                <label for="mood2">Mood 2</label>
-                <input type="text" id="mood2" placeholder="e.g. happy">
-            </div>
-            <div class="input-group">
-                <label for="mood3">Mood 3</label>
-                <input type="text" id="mood3" placeholder="e.g. adventurous">
-            </div>
-            <div class="input-group">
-                <label for="mood4">Mood 4</label>
-                <input type="text" id="mood4" placeholder="e.g. social">
-            </div>
-            <div class="input-group">
-                <label for="mood5">Mood 5</label>
-                <input type="text" id="mood5" placeholder="e.g. celebratory">
-            </div>
-        </div>
 
-        <button class="find-btn" onclick="findCocktail()">💃 Find My Cocktail! 🍹✨</button>
+<div id="sync-status">
+  <div class="sync-dot" id="sync-dot"></div>
+  <span id="sync-text">local</span>
+</div>
 
-        <div class="error" id="error">Please fill in all 5 mood words!</div>
+<header>
+  <div class="logo">Pour Decisions 🍹</div>
+  <div class="tagline">Track your tabs. Own your chaos.</div>
+</header>
 
-        <div class="result" id="result">
-            <div class="cocktail-emoji" id="emoji"></div>
-            <div class="cocktail-name" id="cocktailName"></div>
-            
-            <div class="mood-match">
-                <h3>Why This Matches Your Mood:</h3>
-                <p id="moodExplanation"></p>
-            </div>
+<nav class="tabs">
+  <button class="tab-btn active" onclick="showTab('leaderboard')">🏆 Leaderboard</button>
+  <button class="tab-btn" onclick="showTab('add')">➕ Add Debt</button>
+  <button class="tab-btn" onclick="showTab('history')">📜 History</button>
+  <button class="tab-btn" onclick="showTab('drinks')">🍸 Menu & Reasons</button>
+</nav>
 
-            <div class="recipe">
-                <h3>Recipe:</h3>
-                <div class="ingredients">
-                    <h4>Ingredients:</h4>
-                    <ul id="ingredients"></ul>
-                </div>
-                <div class="instructions">
-                    <h4>Instructions:</h4>
-                    <ol id="instructions"></ol>
-                </div>
-            </div>
-        </div>
+<main>
+
+  <!-- LEADERBOARD TAB -->
+  <div class="tab-panel active" id="tab-leaderboard">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-number" id="stat-total" style="color:var(--coral)">0</div>
+        <div class="stat-label">Total Debts</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-people" style="color:var(--teal)">0</div>
+        <div class="stat-label">People</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-drinks-total" style="color:var(--gold)">0</div>
+        <div class="stat-label">Drinks Owed</div>
+      </div>
     </div>
 
-    <script>
-        const cocktails = {
-            energetic: {
-                name: "Espresso Martini",
-                emoji: "☕",
-                ingredients: [
-                    "2 oz vodka",
-                    "1 oz coffee liqueur (Kahlúa)",
-                    "1 oz freshly brewed espresso",
-                    "½ oz simple syrup",
-                    "Coffee beans for garnish"
-                ],
-                instructions: [
-                    "Brew a shot of espresso and let it cool slightly",
-                    "Fill a cocktail shaker with ice",
-                    "Add vodka, coffee liqueur, espresso, and simple syrup",
-                    "Shake vigorously for 15-20 seconds until well-chilled",
-                    "Strain into a chilled martini glass",
-                    "Garnish with 3 coffee beans"
-                ],
-                keywords: ["energetic", "excited", "active", "hyper", "awake", "alert", "pumped", "lively"]
-            },
-            relaxed: {
-                name: "Mai Tai",
-                emoji: "🌺",
-                ingredients: [
-                    "2 oz aged rum",
-                    "¾ oz fresh lime juice",
-                    "½ oz orange curaçao",
-                    "¼ oz orgeat syrup",
-                    "¼ oz simple syrup",
-                    "Mint sprig and lime wheel for garnish"
-                ],
-                instructions: [
-                    "Fill a cocktail shaker with ice",
-                    "Add rum, lime juice, curaçao, orgeat, and simple syrup",
-                    "Shake well for 10-15 seconds",
-                    "Strain into a rocks glass filled with crushed ice",
-                    "Garnish with mint sprig and lime wheel",
-                    "Sip slowly and relax"
-                ],
-                keywords: ["relaxed", "calm", "peaceful", "chill", "mellow", "tranquil", "serene", "easy"]
-            },
-            sophisticated: {
-                name: "French 75",
-                emoji: "🥂",
-                ingredients: [
-                    "1 oz gin",
-                    "½ oz fresh lemon juice",
-                    "½ oz simple syrup",
-                    "3 oz champagne",
-                    "Lemon twist for garnish"
-                ],
-                instructions: [
-                    "Fill a cocktail shaker with ice",
-                    "Add gin, lemon juice, and simple syrup",
-                    "Shake well for 10 seconds",
-                    "Strain into a champagne flute",
-                    "Top with champagne",
-                    "Garnish with a lemon twist"
-                ],
-                keywords: ["sophisticated", "elegant", "classy", "refined", "fancy", "upscale", "chic", "stylish"]
-            },
-            adventurous: {
-                name: "Mezcal Margarita",
-                emoji: "🔥",
-                ingredients: [
-                    "2 oz mezcal",
-                    "1 oz fresh lime juice",
-                    "¾ oz Cointreau",
-                    "½ oz agave syrup",
-                    "Tajín for rim",
-                    "Lime wheel for garnish"
-                ],
-                instructions: [
-                    "Rim a rocks glass with Tajín and fill with ice",
-                    "Fill a cocktail shaker with ice",
-                    "Add mezcal, lime juice, Cointreau, and agave syrup",
-                    "Shake vigorously for 15 seconds",
-                    "Strain into the prepared glass",
-                    "Garnish with a lime wheel"
-                ],
-                keywords: ["adventurous", "bold", "daring", "brave", "wild", "spontaneous", "fearless", "edgy"]
-            },
-            romantic: {
-                name: "Strawberry Basil Smash",
-                emoji: "💕",
-                ingredients: [
-                    "2 oz gin",
-                    "¾ oz fresh lemon juice",
-                    "½ oz simple syrup",
-                    "4-5 fresh strawberries",
-                    "6-8 basil leaves",
-                    "Strawberry and basil for garnish"
-                ],
-                instructions: [
-                    "In a shaker, muddle strawberries and basil leaves",
-                    "Add ice, gin, lemon juice, and simple syrup",
-                    "Shake well for 15 seconds",
-                    "Double strain into a rocks glass over ice",
-                    "Garnish with a strawberry and basil leaf",
-                    "Share with someone special"
-                ],
-                keywords: ["romantic", "loving", "sweet", "tender", "intimate", "affectionate", "passionate", "warm"]
-            },
-            playful: {
-                name: "Aperol Spritz",
-                emoji: "🍊",
-                ingredients: [
-                    "3 oz Prosecco",
-                    "2 oz Aperol",
-                    "1 oz soda water",
-                    "Orange slice for garnish",
-                    "Ice"
-                ],
-                instructions: [
-                    "Fill a wine glass with ice",
-                    "Add Prosecco",
-                    "Add Aperol",
-                    "Top with soda water",
-                    "Stir gently",
-                    "Garnish with an orange slice"
-                ],
-                keywords: ["playful", "fun", "cheerful", "silly", "lighthearted", "jovial", "bubbly", "carefree"]
-            },
-            mysterious: {
-                name: "Black Manhattan",
-                emoji: "🌙",
-                ingredients: [
-                    "2 oz rye whiskey",
-                    "1 oz Averna amaro",
-                    "2 dashes orange bitters",
-                    "Luxardo cherry for garnish"
-                ],
-                instructions: [
-                    "Fill a mixing glass with ice",
-                    "Add whiskey, amaro, and bitters",
-                    "Stir for 30 seconds until well-chilled",
-                    "Strain into a chilled coupe glass",
-                    "Garnish with a Luxardo cherry",
-                    "Sip slowly in dim lighting"
-                ],
-                keywords: ["mysterious", "dark", "intriguing", "enigmatic", "secretive", "sultry", "moody", "deep"]
-            },
-            confident: {
-                name: "Old Fashioned",
-                emoji: "💪",
-                ingredients: [
-                    "2 oz bourbon or rye whiskey",
-                    "1 sugar cube",
-                    "2-3 dashes Angostura bitters",
-                    "Orange peel",
-                    "Luxardo cherry"
-                ],
-                instructions: [
-                    "Place sugar cube in rocks glass",
-                    "Add bitters and a splash of water",
-                    "Muddle until sugar dissolves",
-                    "Add whiskey and large ice cube",
-                    "Stir gently for 20-30 seconds",
-                    "Express orange peel over drink and garnish with peel and cherry"
-                ],
-                keywords: ["confident", "strong", "powerful", "bold", "assured", "self-assured", "determined", "assertive"]
-            },
-            tropical: {
-                name: "Piña Colada",
-                emoji: "🥥",
-                ingredients: [
-                    "2 oz white rum",
-                    "3 oz pineapple juice",
-                    "2 oz coconut cream",
-                    "1 cup crushed ice",
-                    "Pineapple wedge and cherry for garnish"
-                ],
-                instructions: [
-                    "Add rum, pineapple juice, coconut cream, and ice to blender",
-                    "Blend until smooth",
-                    "Pour into a hurricane glass",
-                    "Garnish with pineapple wedge and cherry",
-                    "Add a fun umbrella",
-                    "Imagine you're on a beach"
-                ],
-                keywords: ["tropical", "vacation", "sunny", "beachy", "paradise", "escape", "island", "warm"]
-            },
-            nostalgic: {
-                name: "Whiskey Sour",
-                emoji: "🍋✨",
-                ingredients: [
-                    "2 oz bourbon whiskey",
-                    "¾ oz fresh lemon juice",
-                    "½ oz simple syrup",
-                    "½ oz egg white (optional)",
-                    "Angostura bitters",
-                    "Lemon wheel and cherry for garnish"
-                ],
-                instructions: [
-                    "Add all ingredients to a shaker without ice",
-                    "Dry shake for 10 seconds (to emulsify egg white)",
-                    "Add ice and shake vigorously for 15 seconds",
-                    "Strain into a rocks glass over ice",
-                    "Dash bitters on top for decoration",
-                    "Garnish with lemon wheel and cherry"
-                ],
-                keywords: ["nostalgic", "classic", "traditional", "vintage", "timeless", "retro", "sentimental", "old-school"]
-            },
-            sassy: {
-                name: "Cosmopolitan",
-                emoji: "💋💕",
-                ingredients: [
-                    "1.5 oz vodka (Citron if you have it)",
-                    "1 oz Cointreau",
-                    "½ oz fresh lime juice",
-                    "¼ oz cranberry juice",
-                    "Lime wheel or orange twist"
-                ],
-                instructions: [
-                    "Fill a shaker with ice (we're fancy like that)",
-                    "Add vodka, Cointreau, lime juice, and cranberry",
-                    "Shake like you mean it for 15 seconds",
-                    "Strain into a chilled martini glass",
-                    "Garnish with lime wheel",
-                    "Channel your inner Carrie Bradshaw"
-                ],
-                keywords: ["sassy", "confident", "fabulous", "fierce", "girl-boss", "glamorous", "bold", "diva"]
-            },
-            cozy: {
-                name: "Hot Toddy",
-                emoji: "🍯☕",
-                ingredients: [
-                    "2 oz bourbon or whiskey",
-                    "1 tbsp honey",
-                    "2 tsp fresh lemon juice",
-                    "1 cup hot water",
-                    "Cinnamon stick",
-                    "Lemon wheel and star anise"
-                ],
-                instructions: [
-                    "Add honey and lemon juice to a mug",
-                    "Pour in hot water and stir until honey dissolves",
-                    "Add whiskey",
-                    "Stir gently",
-                    "Garnish with cinnamon stick, lemon wheel, and star anise",
-                    "Curl up with a blanket and enjoy"
-                ],
-                keywords: ["cozy", "warm", "comfort", "snuggly", "relaxing", "homey", "comforting", "toasty"]
-            },
-            fancy: {
-                name: "Champagne Cocktail",
-                emoji: "🥂👑",
-                ingredients: [
-                    "1 sugar cube",
-                    "2-3 dashes Angostura bitters",
-                    "4 oz champagne",
-                    "Lemon twist",
-                    "Optional: splash of cognac"
-                ],
-                instructions: [
-                    "Place sugar cube in champagne flute",
-                    "Saturate with bitters",
-                    "Fill with champagne",
-                    "Optional: add a splash of cognac for extra elegance",
-                    "Express lemon twist over drink",
-                    "Sip with your pinky out"
-                ],
-                keywords: ["fancy", "elegant", "luxury", "celebration", "special", "glamorous", "upscale", "bougie"]
-            },
-            spicy: {
-                name: "Jalapeño Margarita",
-                emoji: "🌶️🔥",
-                ingredients: [
-                    "2 oz tequila (reposado)",
-                    "1 oz fresh lime juice",
-                    "½ oz Cointreau",
-                    "½ oz agave syrup",
-                    "2-3 slices jalapeño",
-                    "Salt for rim"
-                ],
-                instructions: [
-                    "Rim glass with salt and fill with ice",
-                    "In shaker, muddle jalapeño slices",
-                    "Add tequila, lime juice, Cointreau, agave, and ice",
-                    "Shake vigorously for 15 seconds",
-                    "Strain into prepared glass",
-                    "Garnish with jalapeño slice (if you dare!)"
-                ],
-                keywords: ["spicy", "hot", "fiery", "bold", "zesty", "intense", "daring", "kick"]
-            },
-            fresh: {
-                name: "Mojito",
-                emoji: "🌿💚",
-                ingredients: [
-                    "2 oz white rum",
-                    "1 oz fresh lime juice",
-                    "2 tsp sugar",
-                    "8-10 fresh mint leaves",
-                    "Soda water",
-                    "Lime wheel and mint sprig"
-                ],
-                instructions: [
-                    "Add mint leaves and sugar to glass",
-                    "Muddle gently (don't destroy the mint!)",
-                    "Add lime juice and rum",
-                    "Fill glass with ice",
-                    "Top with soda water",
-                    "Stir gently and garnish with lime and mint"
-                ],
-                keywords: ["fresh", "minty", "crisp", "clean", "refreshing", "bright", "cool", "light"]
-            },
-            festive: {
-                name: "Cranberry Moscow Mule",
-                emoji: "🎄✨",
-                ingredients: [
-                    "2 oz vodka",
-                    "½ oz lime juice",
-                    "2 oz cranberry juice",
-                    "4 oz ginger beer",
-                    "Fresh cranberries and rosemary"
-                ],
-                instructions: [
-                    "Fill copper mug (or glass) with ice",
-                    "Add vodka, lime juice, and cranberry juice",
-                    "Top with ginger beer",
-                    "Stir gently",
-                    "Garnish with fresh cranberries and rosemary sprig",
-                    "Perfect for holiday vibes!"
-                ],
-                keywords: ["festive", "holiday", "celebration", "party", "merry", "jolly", "cheerful", "seasonal"]
-            },
-            sophisticated: {
-                name: "Negroni",
-                emoji: "🍊🎩",
-                ingredients: [
-                    "1 oz gin",
-                    "1 oz Campari",
-                    "1 oz sweet vermouth",
-                    "Orange peel"
-                ],
-                instructions: [
-                    "Fill rocks glass with ice",
-                    "Add gin, Campari, and vermouth",
-                    "Stir for 20-30 seconds",
-                    "Express orange peel over drink",
-                    "Drop peel into glass",
-                    "Contemplate life's complexities"
-                ],
-                keywords: ["sophisticated", "bitter", "complex", "refined", "cultured", "worldly", "distinguished", "intellectual"]
-            },
-            dreamy: {
-                name: "Lavender Lemon Drop",
-                emoji: "💜☁️",
-                ingredients: [
-                    "2 oz vodka",
-                    "¾ oz fresh lemon juice",
-                    "½ oz lavender simple syrup",
-                    "½ oz triple sec",
-                    "Sugar for rim",
-                    "Lemon twist and lavender sprig"
-                ],
-                instructions: [
-                    "Rim martini glass with sugar",
-                    "Fill shaker with ice",
-                    "Add vodka, lemon juice, lavender syrup, and triple sec",
-                    "Shake for 15 seconds",
-                    "Strain into prepared glass",
-                    "Garnish with lemon twist and lavender"
-                ],
-                keywords: ["dreamy", "ethereal", "whimsical", "magical", "floaty", "fantasy", "enchanting", "heavenly"]
-            },
-            powerful: {
-                name: "Manhattan",
-                emoji: "💪🌃",
-                ingredients: [
-                    "2 oz rye whiskey",
-                    "1 oz sweet vermouth",
-                    "2 dashes Angostura bitters",
-                    "Luxardo cherry"
-                ],
-                instructions: [
-                    "Fill mixing glass with ice",
-                    "Add whiskey, vermouth, and bitters",
-                    "Stir for 30-40 seconds until well-chilled",
-                    "Strain into chilled coupe glass",
-                    "Garnish with Luxardo cherry",
-                    "Own the room"
-                ],
-                keywords: ["powerful", "strong", "commanding", "authoritative", "dominant", "forceful", "mighty", "boss"]
-            }
-        };
+    <div class="card">
+      <div class="section-header">
+        <h2>🏆 Who Owes Who</h2>
+      </div>
+      <div id="leaderboard-list">
+        <div class="empty">
+          <div class="emoji">🍹</div>
+          <p>No debts yet! Add one to get started.</p>
+        </div>
+      </div>
+    </div>
 
-        function findCocktail() {
-            // Get mood values
-            const moods = [
-                document.getElementById('mood1').value.trim().toLowerCase(),
-                document.getElementById('mood2').value.trim().toLowerCase(),
-                document.getElementById('mood3').value.trim().toLowerCase(),
-                document.getElementById('mood4').value.trim().toLowerCase(),
-                document.getElementById('mood5').value.trim().toLowerCase()
-            ];
+    <div class="card">
+      <div class="section-header">
+        <h2>💬 Costly Reasons</h2>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem">Which reasons have racked up the most drinks?</p>
+      <div id="reasons-leaderboard">
+        <div class="empty"><div class="emoji">🤔</div><p>No reasons tracked yet.</p></div>
+      </div>
+    </div>
+  </div>
 
-            // Validate inputs
-            const error = document.getElementById('error');
-            if (moods.some(m => m === '')) {
-                error.classList.add('show');
-                setTimeout(() => error.classList.remove('show'), 3000);
-                return;
-            }
-            error.classList.remove('show');
+  <!-- ADD DEBT TAB -->
+  <div class="tab-panel" id="tab-add">
+    <div class="card">
+      <h2>➕ Log a Drink Debt</h2>
 
-            // Find best matching cocktail
-            let bestMatch = null;
-            let maxScore = 0;
+      <div class="form-row">
+        <div class="form-group">
+          <label>Who owes?</label>
+          <input type="text" id="from-person" placeholder="e.g. Phil" list="people-list" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>Who to? <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(add multiple)</span></label>
+          <div id="to-tags" style="display:flex;flex-wrap:wrap;gap:0.35rem;min-height:2.5rem;background:rgba(255,255,255,0.07);border:1px solid var(--border);border-radius:10px;padding:0.4rem 0.6rem;align-items:center;cursor:text;" onclick="document.getElementById('to-person-input').focus()">
+            <input type="text" id="to-person-input" placeholder="Type a name, hit Enter" list="people-list" autocomplete="off"
+              style="background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.95rem;min-width:140px;flex:1;padding:0.15rem 0;"
+              onkeydown="handleToPersonKey(event)" />
+          </div>
+        </div>
+      </div>
 
-            for (const [category, cocktail] of Object.entries(cocktails)) {
-                let score = 0;
-                moods.forEach(mood => {
-                    if (cocktail.keywords.some(keyword => 
-                        keyword.includes(mood) || mood.includes(keyword)
-                    )) {
-                        score++;
-                    }
-                });
-                
-                if (score > maxScore) {
-                    maxScore = score;
-                    bestMatch = cocktail;
-                }
-            }
+      <datalist id="people-list"></datalist>
 
-            // If no matches, pick a random one
-            if (maxScore === 0) {
-                const categories = Object.keys(cocktails);
-                const randomCategory = categories[Math.floor(Math.random() * categories.length)];
-                bestMatch = cocktails[randomCategory];
-            }
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Pick a Drink</label>
+        <div class="drink-chips" id="drink-chips"></div>
+      </div>
 
-            // Display result
-            displayCocktail(bestMatch, moods, maxScore);
-        }
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Or type a custom drink</label>
+        <input type="text" id="custom-drink-input" placeholder="e.g. Frosé" />
+      </div>
 
-        function displayCocktail(cocktail, moods, matchScore) {
-            document.getElementById('emoji').textContent = cocktail.emoji;
-            document.getElementById('cocktailName').textContent = cocktail.name;
-            
-            // Create mood explanation
-            let explanation = `Based on your vibe (${moods.join(', ')}), `;
-            if (matchScore > 0) {
-                explanation += `we found ${matchScore} mood match${matchScore > 1 ? 'es' : ''} with this cocktail! `;
-            }
-            explanation += `This drink captures your energy perfectly.`;
-            document.getElementById('moodExplanation').textContent = explanation;
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Why do they owe? <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optional but fun)</span></label>
+        <div class="drink-chips" id="reason-chips"></div>
+        <input type="text" id="custom-reason-input" placeholder="Or type a new reason — it'll be saved for next time" style="margin-top:0.5rem" />
+      </div>
 
-            // Display ingredients
-            const ingredientsList = document.getElementById('ingredients');
-            ingredientsList.innerHTML = '';
-            cocktail.ingredients.forEach(ingredient => {
-                const li = document.createElement('li');
-                li.textContent = ingredient;
-                ingredientsList.appendChild(li);
-            });
+      <hr class="divider" />
 
-            // Display instructions
-            const instructionsList = document.getElementById('instructions');
-            instructionsList.innerHTML = '';
-            cocktail.instructions.forEach(instruction => {
-                const li = document.createElement('li');
-                li.textContent = instruction;
-                instructionsList.appendChild(li);
-            });
+      <label>How many?</label>
+      <div class="quantity-row">
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <div class="qty-display" id="qty-display">1</div>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
 
-            // Show result
-            document.getElementById('result').classList.add('show');
-            
-            // Smooth scroll to result
-            setTimeout(() => {
-                document.getElementById('result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 100);
-        }
+      <button class="btn btn-primary" onclick="addDebt()">🍺 Log the Debt</button>
+    </div>
+  </div>
 
-        // Allow Enter key to submit
-        document.querySelectorAll('input').forEach(input => {
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    findCocktail();
-                }
-            });
-        });
-    </script>
+  <!-- HISTORY TAB -->
+  <div class="tab-panel" id="tab-history">
+    <div class="card">
+      <div class="section-header">
+        <h2>📜 All Debts</h2>
+        <span style="font-size:0.8rem;color:var(--muted)" id="history-count"></span>
+      </div>
+      <div id="history-list">
+        <div class="empty"><div class="emoji">📭</div><p>Nothing logged yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRINKS & REASONS TAB -->
+  <div class="tab-panel" id="tab-drinks">
+    <div class="card">
+      <h2>🍸 Drink Menu</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">These drinks appear as quick-picks when adding a debt. Add your own!</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Drink name</label>
+          <input type="text" id="new-drink-name" placeholder="e.g. Aperol Spritz" />
+        </div>
+        <div class="form-group">
+          <label>Emoji</label>
+          <input type="text" id="new-drink-emoji" placeholder="🍊" maxlength="2" />
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addDrink()">Add to Menu</button>
+
+      <hr class="divider" />
+      <div id="drinks-list"></div>
+    </div>
+
+    <div class="card">
+      <h2>💬 Reasons</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">Pre-set reasons for owing drinks — projects, mistakes, bets, anything. Pick one when logging a debt.</p>
+
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>New reason</label>
+        <input type="text" id="new-reason-name" placeholder="e.g. Project Phoenix, Called it wrong, Lost the bet" />
+      </div>
+      <button class="btn btn-primary" onclick="addReason()">Add Reason</button>
+
+      <hr class="divider" />
+      <div id="reasons-list"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ADD DEBT CONFIRM MODAL -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h3>🍹 Confirm Debt</h3>
+    <p id="confirm-text" style="margin-bottom:0.5rem;color:var(--muted)"></p>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1;margin:0" onclick="confirmDebt()">Log it!</button>
+    </div>
+  </div>
+</div>
+
+<!-- PASSWORD SCREEN -->
+<div id="password-screen" style="display:none;position:fixed;inset:0;background:var(--navy);z-index:9999;align-items:center;justify-content:center;padding:1rem;">
+  <div style="width:100%;max-width:380px;text-align:center;">
+    <div style="font-family:'Pacifico',cursive;font-size:2.5rem;background:linear-gradient(135deg,var(--lime),var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:0.5rem;">Pour Decisions 🍹</div>
+    <p style="color:var(--muted);font-size:0.9rem;margin-bottom:2rem;">Enter the password to access the tab</p>
+    <div class="form-group" style="margin-bottom:1rem;text-align:left;">
+      <label>Password</label>
+      <input type="password" id="pw-input" placeholder="Enter password…" onkeydown="if(event.key==='Enter')checkPassword()" />
+    </div>
+    <button class="btn btn-primary" onclick="checkPassword()">🍺 Enter the Bar</button>
+    <p id="pw-error" style="color:var(--coral);font-size:0.85rem;margin-top:0.75rem;display:none;">Wrong password — try again!</p>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  DATA & STATE
+// ═══════════════════════════════════════════════
+const DEFAULT_DRINKS = [
+  { name: 'Beer', emoji: '🍺' },
+  { name: 'Red Wine', emoji: '🍷' },
+  { name: 'White Wine', emoji: '🥂' },
+  { name: 'Margarita', emoji: '🍹' },
+  { name: 'Espresso Martini', emoji: '☕' },
+  { name: 'Old Fashioned', emoji: '🥃' },
+  { name: 'Negroni', emoji: '🍊' },
+  { name: 'NA Cocktail', emoji: '🌿' },
+  { name: 'Champagne', emoji: '🍾' },
+  { name: 'Whiskey', emoji: '🥃' },
+];
+
+const DEFAULT_REASONS = [
+  'Lost a bet',
+  'Called it wrong',
+  'Pure generosity',
+  'They were right',
+  'Made a mistake',
+];
+
+let state = {
+  debts: [],
+  drinks: [...DEFAULT_DRINKS],
+  reasons: [...DEFAULT_REASONS],
+};
+
+let ghConfig = null; // no longer needed client-side
+let appPassword = localStorage.getItem('pd_password') || null;
+let selectedDrink = null;
+let selectedReason = null;
+let toPersons = [];
+let quantity = 1;
+let pendingDebt = null;
+let ghFileSha = null;
+
+// ═══════════════════════════════════════════════
+//  PASSWORD
+// ═══════════════════════════════════════════════
+function checkPassword() {
+  const val = document.getElementById('pw-input').value.trim();
+  if (!val) return;
+  // Test it against the API
+  setSyncStatus('syncing', 'checking…');
+  fetch('/api/save', { headers: { 'x-app-password': val } })
+    .then(r => {
+      if (r.ok || r.status === 200) {
+        appPassword = val;
+        localStorage.setItem('pd_password', val);
+        document.getElementById('password-screen').style.display = 'none';
+        loadFromAPI();
+      } else {
+        document.getElementById('pw-error').style.display = 'block';
+        setSyncStatus('error', 'wrong password');
+      }
+    })
+    .catch(() => {
+      document.getElementById('pw-error').style.display = 'block';
+      setSyncStatus('error', 'error');
+    });
+}
+
+// ═══════════════════════════════════════════════
+//  API SYNC
+// ═══════════════════════════════════════════════
+async function loadFromAPI() {
+  setSyncStatus('syncing', 'syncing…');
+  try {
+    const res = await fetch('/api/save', {
+      headers: { 'x-app-password': appPassword }
+    });
+    if (res.status === 401) { showPasswordScreen(); return; }
+    if (!res.ok) throw new Error('Load failed');
+    const json = await res.json();
+    if (json.data) {
+      ghFileSha = json.sha;
+      state = json.data;
+      DEFAULT_DRINKS.forEach(d => {
+        if (!state.drinks.find(x => x.name === d.name)) state.drinks.unshift(d);
+      });
+      if (!state.reasons) state.reasons = [];
+      DEFAULT_REASONS.forEach(r => {
+        if (!state.reasons.includes(r)) state.reasons.unshift(r);
+      });
+    }
+    renderAll();
+    setSyncStatus('synced', 'synced ✓');
+  } catch (e) {
+    setSyncStatus('error', 'sync error');
+    console.error(e);
+  }
+}
+
+async function saveToGitHub(newDebts = []) {
+  setSyncStatus('syncing', 'saving…');
+  try {
+    const res = await fetch('/api/save', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-app-password': appPassword
+      },
+      body: JSON.stringify({ data: state, sha: ghFileSha, newDebts })
+    });
+    if (res.status === 401) { showPasswordScreen(); return; }
+    if (!res.ok) throw new Error(await res.text());
+    const json = await res.json();
+    ghFileSha = json.sha;
+    setSyncStatus('synced', 'saved ✓');
+  } catch (e) {
+    setSyncStatus('error', 'save failed');
+    console.error(e);
+    toast('⚠️ Save failed');
+  }
+}
+
+function setSyncStatus(state, text) {
+  const dot = document.getElementById('sync-dot');
+  const label = document.getElementById('sync-text');
+  dot.className = 'sync-dot ' + state;
+  label.textContent = text;
+}
+
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+function renderAll() {
+  renderLeaderboard();
+  renderHistory();
+  renderDrinks();
+  renderReasons();
+  renderDrinkChips();
+  renderReasonChips();
+  renderPeopleList();
+}
+
+function pairKey(a, b) {
+  return [a, b].sort().join('|');
+}
+
+function computeNetDebts() {
+  // Returns map of pairKey -> { from, to, count, drinks }
+  const map = {};
+  state.debts.forEach(d => {
+    const key = pairKey(d.from, d.to);
+    if (!map[key]) map[key] = {};
+    const drinkKey = d.drink;
+    if (!map[key][drinkKey]) map[key][drinkKey] = 0;
+    // Positive = d.from owes the first-sorted person
+    const [a] = [d.from, d.to].sort();
+    const sign = d.from === a ? 1 : -1;
+    map[key][drinkKey] += sign * d.qty;
+  });
+  return map;
+}
+
+function renderLeaderboard() {
+  const netMap = computeNetDebts();
+  const entries = [];
+
+  Object.keys(netMap).forEach(key => {
+    const [a, b] = key.split('|');
+    const drinks = netMap[key];
+    let totalNet = 0;
+    const drinkSummary = [];
+    let netOwer = null;
+    let netOwee = null;
+
+    Object.keys(drinks).forEach(drinkName => {
+      const net = drinks[drinkName];
+      totalNet += Math.abs(net);
+      if (net !== 0) {
+        const ower = net > 0 ? a : b;
+        const owee = net > 0 ? b : a;
+        // Track the dominant direction for the headline
+        if (!netOwer) { netOwer = ower; netOwee = owee; }
+        drinkSummary.push(`${Math.abs(net)} ${drinkName}`);
+      }
+    });
+
+    if (totalNet > 0) {
+      entries.push({ key, a, b, totalNet, drinkSummary, drinks, netOwer, netOwee });
+    }
+  });
+
+  entries.sort((x, y) => y.totalNet - x.totalNet);
+
+  const list = document.getElementById('leaderboard-list');
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="emoji">🍹</div><p>No outstanding debts! You're all square. 🎉</p></div>`;
+    document.getElementById('stat-total').textContent = 0;
+    document.getElementById('stat-people').textContent = 0;
+    document.getElementById('stat-drinks-total').textContent = 0;
+    return;
+  }
+
+  let totalDrinks = 0;
+  const people = new Set();
+  state.debts.forEach(d => { people.add(d.from); people.add(d.to); totalDrinks += d.qty; });
+
+  document.getElementById('stat-total').textContent = state.debts.length;
+  document.getElementById('stat-people').textContent = people.size;
+  document.getElementById('stat-drinks-total').textContent = totalDrinks;
+
+  list.innerHTML = entries.map((e, i) => {
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+    const rankSymbol = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+    const detail = e.drinkSummary.join(' · ');
+    return `
+      <div class="leaderboard-item">
+        <div class="rank ${rankClass}">${rankSymbol}</div>
+        <div class="lb-names">
+          <div class="lb-pair"><span style="color:var(--coral)">${e.netOwer}</span> owes <span style="color:var(--teal)">${e.netOwee}</span></div>
+          <div class="lb-detail">${detail}</div>
+        </div>
+        <div class="lb-drinks">
+          <div class="lb-count positive">${e.totalNet}</div>
+          <div class="lb-label">net drinks</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  document.getElementById('history-count').textContent = `${state.debts.length} entries`;
+
+  if (state.debts.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="emoji">📭</div><p>Nothing logged yet.</p></div>`;
+    return;
+  }
+
+  const sorted = [...state.debts].reverse();
+  list.innerHTML = sorted.map((d, i) => {
+    const realIndex = state.debts.length - 1 - i;
+    const drinkObj = state.drinks.find(x => x.name === d.drink);
+    const emoji = drinkObj ? drinkObj.emoji : '🍹';
+    const date = new Date(d.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return `
+      <div class="debt-item">
+        <div class="drink-badge">${emoji}</div>
+        <div class="debt-info">
+          <strong>${d.from}</strong> owes <strong>${d.to}</strong>
+          <div class="debt-meta">${d.qty}× ${d.drink} · ${date}${d.reason ? ` · 💬 "${d.reason}"` : ''}</div>
+        </div>
+        <button class="btn btn-danger" onclick="removeDebt(${realIndex})">✕</button>
+      </div>`;
+  }).join('');
+}
+
+function renderDrinks() {
+  const list = document.getElementById('drinks-list');
+  list.innerHTML = state.drinks.map((d, i) => `
+    <div class="debt-item">
+      <div class="drink-badge">${d.emoji}</div>
+      <div class="debt-info"><strong>${d.name}</strong></div>
+      ${i >= DEFAULT_DRINKS.length ? `<button class="btn btn-danger" onclick="removeDrink(${i})">✕</button>` : ''}
+    </div>`).join('');
+}
+
+function renderDrinkChips() {
+  const chips = document.getElementById('drink-chips');
+  chips.innerHTML = state.drinks.map(d => `
+    <div class="chip ${selectedDrink === d.name ? 'selected' : ''}" onclick="selectDrink('${d.name.replace(/'/g,"\\'")}')">
+      ${d.emoji} ${d.name}
+    </div>`).join('');
+}
+
+function renderReasonChips() {
+  const chips = document.getElementById('reason-chips');
+  if (!chips) return;
+  chips.innerHTML = state.reasons.map(r => `
+    <div class="chip reason-chip ${selectedReason === r ? 'selected' : ''}" onclick="selectReason('${r.replace(/'/g,"\\'")}')">
+      💬 ${r}
+    </div>`).join('');
+}
+
+function renderReasons() {
+  // Management list in the drinks/reasons tab
+  const list = document.getElementById('reasons-list');
+  if (!list) return;
+  if (state.reasons.length === 0) {
+    list.innerHTML = `<div class="empty"><div class="emoji">🤷</div><p>No reasons yet. Add one above!</p></div>`;
+  } else {
+    list.innerHTML = state.reasons.map((r, i) => {
+      const total = state.debts.filter(d => d.reason === r).reduce((sum, d) => sum + d.qty, 0);
+      const isDefault = DEFAULT_REASONS.includes(r);
+      return `
+        <div class="debt-item">
+          <div class="drink-badge">💬</div>
+          <div class="debt-info">
+            <strong>${r}</strong>
+            <div class="debt-meta">${total} drink${total !== 1 ? 's' : ''} owed because of this</div>
+          </div>
+          ${!isDefault ? `<button class="btn btn-danger" onclick="removeReason(${i})">✕</button>` : ''}
+        </div>`;
+    }).join('');
+  }
+
+  // Leaderboard section on main tab
+  const lb = document.getElementById('reasons-leaderboard');
+  if (!lb) return;
+  const totals = state.reasons.map(r => ({
+    reason: r,
+    total: state.debts.filter(d => d.reason === r).reduce((sum, d) => sum + d.qty, 0)
+  })).filter(x => x.total > 0).sort((a,b) => b.total - a.total);
+
+  if (totals.length === 0) {
+    lb.innerHTML = `<div class="empty"><div class="emoji">🤔</div><p>No reasons tracked yet.</p></div>`;
+    return;
+  }
+
+  lb.innerHTML = totals.map((item, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : '';
+    return `
+      <div class="leaderboard-item">
+        <div class="rank ${rankClass}">${medal}</div>
+        <div class="lb-names">
+          <div class="lb-pair">💬 ${item.reason}</div>
+        </div>
+        <div class="lb-drinks">
+          <div class="lb-count positive">${item.total}</div>
+          <div class="lb-label">drinks owed</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderPeopleList() {
+  const people = new Set();
+  state.debts.forEach(d => { people.add(d.from); people.add(d.to); });
+  const datalist = document.getElementById('people-list');
+  datalist.innerHTML = [...people].map(p => `<option value="${p}">`).join('');
+}
+
+// ═══════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════
+function selectDrink(name) {
+  selectedDrink = selectedDrink === name ? null : name;
+  document.getElementById('custom-drink-input').value = '';
+  renderDrinkChips();
+}
+
+function selectReason(name) {
+  selectedReason = selectedReason === name ? null : name;
+  document.getElementById('custom-reason-input').value = '';
+  renderReasonChips();
+}
+
+function changeQty(delta) {
+  quantity = Math.max(1, quantity + delta);
+  document.getElementById('qty-display').textContent = quantity;
+}
+
+function handleToPersonKey(e) {
+  if (e.key === 'Enter' || e.key === ',') {
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,$/, '');
+    if (val) addToPerson(val);
+    e.target.value = '';
+  } else if (e.key === 'Backspace' && e.target.value === '' && toPersons.length > 0) {
+    toPersons.pop();
+    renderToTags();
+  }
+}
+
+function addToPerson(name) {
+  if (!name) return;
+  if (toPersons.map(p => p.toLowerCase()).includes(name.toLowerCase())) return;
+  toPersons.push(name);
+  renderToTags();
+}
+
+function removeToPerson(index) {
+  toPersons.splice(index, 1);
+  renderToTags();
+}
+
+function renderToTags() {
+  const container = document.getElementById('to-tags');
+  const input = document.getElementById('to-person-input');
+  // Remove existing tags (keep the input)
+  container.querySelectorAll('.to-tag').forEach(t => t.remove());
+  // Insert tags before the input
+  toPersons.forEach((name, i) => {
+    const tag = document.createElement('div');
+    tag.className = 'to-tag';
+    tag.innerHTML = `${name} <button onclick="removeToPerson(${i})">✕</button>`;
+    container.insertBefore(tag, input);
+  });
+  input.placeholder = toPersons.length > 0 ? 'Add another…' : 'Type a name, hit Enter';
+}
+
+function addDebt() {
+  const from = document.getElementById('from-person').value.trim();
+
+  // Also check if there's an unsubmitted name in the input box
+  const rawInput = document.getElementById('to-person-input').value.trim();
+  if (rawInput) addToPerson(rawInput);
+  document.getElementById('to-person-input').value = '';
+
+  const customDrink = document.getElementById('custom-drink-input').value.trim();
+  const drink = customDrink || selectedDrink;
+
+  if (!from) return toast('Who owes the drink?');
+  if (toPersons.length === 0) return toast('Who are they owed to?');
+  if (toPersons.map(p => p.toLowerCase()).includes(from.toLowerCase())) return toast('Can\'t owe yourself!');
+  if (!drink) return toast('Pick a drink!');
+
+  const customReason = document.getElementById('custom-reason-input').value.trim();
+  const reason = customReason || selectedReason || '';
+
+  // Build one pending debt per person
+  pendingDebt = toPersons.map(to => ({ from, to, drink, qty: quantity, reason, timestamp: Date.now() }));
+
+  const drinkObj = state.drinks.find(x => x.name === drink);
+  const emoji = drinkObj ? drinkObj.emoji : '🍹';
+  const reasonText = reason ? ` · 💬 "${reason}"` : '';
+  const toList = toPersons.join(', ');
+  document.getElementById('confirm-text').textContent =
+    `${from} owes ${toList}  ${quantity}× ${emoji} ${drink} each${reasonText}`;
+
+  document.getElementById('confirm-modal').classList.add('open');
+}
+
+async function confirmDebt() {
+  const customDrink = document.getElementById('custom-drink-input').value.trim();
+  if (customDrink && !state.drinks.find(x => x.name === customDrink)) {
+    state.drinks.push({ name: customDrink, emoji: '🍹' });
+  }
+
+  const customReason = document.getElementById('custom-reason-input').value.trim();
+  if (customReason && !state.reasons.includes(customReason)) {
+    state.reasons.push(customReason);
+  }
+
+  // Push one debt entry per person
+  pendingDebt.forEach(d => state.debts.push(d));
+  closeModal();
+
+  // Reset form
+  document.getElementById('from-person').value = '';
+  document.getElementById('to-person-input').value = '';
+  document.getElementById('custom-drink-input').value = '';
+  document.getElementById('custom-reason-input').value = '';
+  toPersons = [];
+  renderToTags();
+  selectedDrink = null;
+  selectedReason = null;
+  quantity = 1;
+  document.getElementById('qty-display').textContent = '1';
+
+  renderAll();
+  const savedDebts = [...pendingDebt];
+  await saveToGitHub(savedDebts);
+  const count = savedDebts.length;
+  toast(`🍺 ${count > 1 ? count + ' debts' : 'Debt'} logged!`);
+  showTab('leaderboard');
+}
+
+async function removeDebt(index) {
+  state.debts.splice(index, 1);
+  renderAll();
+  await saveToGitHub();
+  toast('Debt removed');
+}
+
+function addDrink() {  const name = document.getElementById('new-drink-name').value.trim();
+  const emoji = document.getElementById('new-drink-emoji').value.trim() || '🍹';
+  if (!name) return toast('Enter a drink name!');
+  if (state.drinks.find(x => x.name.toLowerCase() === name.toLowerCase())) return toast('Already on the menu!');
+  state.drinks.push({ name, emoji });
+  document.getElementById('new-drink-name').value = '';
+  document.getElementById('new-drink-emoji').value = '';
+  renderAll();
+  saveToGitHub();
+  toast(`${emoji} ${name} added to the menu!`);
+}
+
+async function removeDrink(index) {
+  state.drinks.splice(index, 1);
+  renderAll();
+  await saveToGitHub();
+  toast('Drink removed');
+}
+
+function addReason() {
+  const name = document.getElementById('new-reason-name').value.trim();
+  if (!name) return toast('Enter a reason!');
+  if (state.reasons.includes(name)) return toast('Already on the list!');
+  state.reasons.push(name);
+  document.getElementById('new-reason-name').value = '';
+  renderAll();
+  saveToGitHub();
+  toast(`💬 "${name}" added!`);
+}
+
+async function removeReason(index) {
+  state.reasons.splice(index, 1);
+  renderAll();
+  await saveToGitHub();
+  toast('Reason removed');
+}
+
+// ═══════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════
+function showTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick').includes(name)) b.classList.add('active');
+  });
+  if (name === 'add') { renderDrinkChips(); renderReasonChips(); }
+}
+
+function showPasswordScreen() {
+  appPassword = null;
+  localStorage.removeItem('pd_password');
+  document.getElementById('password-screen').style.display = 'flex';
+  document.getElementById('pw-error').style.display = 'none';
+  document.getElementById('pw-input').value = '';
+}
+
+function closeModal() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  pendingDebt = null;
+}
+
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+function init() {
+  renderAll();
+  if (appPassword) {
+    loadFromAPI();
+  } else {
+    showPasswordScreen();
+  }
+}
+
+init();
+</script>
 </body>
 </html>
