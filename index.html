@@ -563,10 +563,34 @@
     </div>
 
     <div class="card">
+      <h2>🎯 Personal Tab</h2>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem">Net across all drink debts — who's in the red, who's sitting pretty.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+        <div>
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--coral);margin-bottom:0.5rem">😬 Biggest Debtors</div>
+          <div id="top5-owes"></div>
+        </div>
+        <div>
+          <div style="font-size:0.78rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--teal);margin-bottom:0.5rem">😇 Most Owed To</div>
+          <div id="top5-owed"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🍩 Drink Breakdown</h2>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1rem">Which drinks are fuelling the most debt?</p>
+      <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;justify-content:center">
+        <canvas id="donut-chart" width="160" height="160" style="flex-shrink:0"></canvas>
+        <div id="donut-legend" style="flex:1;min-width:120px"></div>
+      </div>
+    </div>
+
+    <div class="card">
       <div class="section-header">
         <h2>🏆 Who Owes Who</h2>
       </div>
-      <div id="leaderboard-list">
+      <div id="leaderboard-list" style="max-height:520px;overflow-y:auto;padding-right:0.25rem">
         <div class="empty">
           <div class="emoji">🍹</div>
           <p>No debts yet! Add one to get started.</p>
@@ -848,12 +872,135 @@ function setSyncStatus(state, text) {
 // ═══════════════════════════════════════════════
 function renderAll() {
   renderLeaderboard();
+  renderTop5();
+  renderDonutChart();
   renderHistory();
   renderDrinks();
   renderReasons();
   renderDrinkChips();
   renderReasonChips();
   renderPeopleList();
+}
+
+function computePersonNetTotals() {
+  // Returns map of personName -> net (positive = they owe others, negative = others owe them)
+  const net = {};
+  state.debts.forEach(d => {
+    if (!net[d.from]) net[d.from] = 0;
+    if (!net[d.to]) net[d.to] = 0;
+    net[d.from] += d.qty;  // from owes
+    net[d.to] -= d.qty;    // to is owed
+  });
+  return net;
+}
+
+function renderTop5() {
+  const owesEl = document.getElementById('top5-owes');
+  const owedEl = document.getElementById('top5-owed');
+  if (!owesEl || !owedEl) return;
+
+  const net = computePersonNetTotals();
+  const people = Object.keys(net);
+
+  if (people.length === 0) {
+    owesEl.innerHTML = `<div style="color:var(--muted);font-size:0.85rem">No data yet</div>`;
+    owedEl.innerHTML = `<div style="color:var(--muted);font-size:0.85rem">No data yet</div>`;
+    return;
+  }
+
+  // Biggest debtors: net > 0 (they owe more than they are owed)
+  const debtors = people.filter(p => net[p] > 0)
+    .sort((a,b) => net[b] - net[a]).slice(0, 5);
+
+  // Most owed to: net < 0 (others owe them more)
+  const creditors = people.filter(p => net[p] < 0)
+    .sort((a,b) => net[a] - net[b]).slice(0, 5);
+
+  const medals = ['🥇','🥈','🥉','4️⃣','5️⃣'];
+
+  owesEl.innerHTML = debtors.length === 0
+    ? `<div style="color:var(--muted);font-size:0.85rem">Nobody in debt!</div>`
+    : debtors.map((p, i) => `
+      <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:1rem">${medals[i]}</span>
+        <span style="flex:1;font-weight:600;font-size:0.9rem">${p}</span>
+        <span style="color:var(--coral);font-family:'Pacifico',cursive;font-size:1.1rem">${net[p]}</span>
+      </div>`).join('');
+
+  owedEl.innerHTML = creditors.length === 0
+    ? `<div style="color:var(--muted);font-size:0.85rem">Nobody is owed!</div>`
+    : creditors.map((p, i) => `
+      <div style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0;border-bottom:1px solid var(--border)">
+        <span style="font-size:1rem">${medals[i]}</span>
+        <span style="flex:1;font-weight:600;font-size:0.9rem">${p}</span>
+        <span style="color:var(--teal);font-family:'Pacifico',cursive;font-size:1.1rem">${Math.abs(net[p])}</span>
+      </div>`).join('');
+}
+
+function renderDonutChart() {
+  const canvas = document.getElementById('donut-chart');
+  const legend = document.getElementById('donut-legend');
+  if (!canvas || !legend) return;
+
+  // Tally drinks
+  const counts = {};
+  state.debts.forEach(d => {
+    counts[d.drink] = (counts[d.drink] || 0) + d.qty;
+  });
+
+  const entries = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const total = entries.reduce((s,[,v]) => s+v, 0);
+
+  if (total === 0) {
+    legend.innerHTML = `<div style="color:var(--muted);font-size:0.85rem">No drinks logged yet</div>`;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,160,160);
+    return;
+  }
+
+  const COLORS = ['#c8f135','#06d6a0','#ff6b6b','#ffd166','#a29bfe','#fd79a8','#74b9ff','#55efc4','#fdcb6e','#e17055'];
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,160,160);
+
+  let startAngle = -Math.PI / 2;
+  const cx = 80, cy = 80, outerR = 72, innerR = 42;
+
+  entries.forEach(([drink, count], i) => {
+    const slice = (count / total) * 2 * Math.PI;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, outerR, startAngle, startAngle + slice);
+    ctx.closePath();
+    ctx.fillStyle = COLORS[i % COLORS.length];
+    ctx.fill();
+    startAngle += slice;
+  });
+
+  // Donut hole
+  ctx.beginPath();
+  ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
+  ctx.fillStyle = '#0f3460';
+  ctx.fill();
+
+  // Center text
+  ctx.fillStyle = '#f0f0f0';
+  ctx.font = 'bold 13px DM Sans, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(total + ' drinks', cx, cy);
+
+  // Legend
+  legend.innerHTML = entries.slice(0,8).map(([drink, count], i) => {
+    const drinkObj = state.drinks.find(x => x.name === drink);
+    const emoji = drinkObj ? drinkObj.emoji : '🍹';
+    const pct = Math.round((count/total)*100);
+    return `
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.4rem">
+        <div style="width:10px;height:10px;border-radius:2px;background:${COLORS[i % COLORS.length]};flex-shrink:0"></div>
+        <span style="font-size:0.82rem;flex:1">${emoji} ${drink}</span>
+        <span style="font-size:0.82rem;color:var(--muted)">${count} (${pct}%)</span>
+      </div>`;
+  }).join('');
 }
 
 function pairKey(a, b) {
