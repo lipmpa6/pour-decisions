@@ -665,10 +665,70 @@
     <div class="card">
       <div class="section-header">
         <h2>📜 All Debts</h2>
-        <span style="font-size:0.8rem;color:var(--muted)" id="history-count"></span>
+        <button class="btn" style="font-size:0.78rem;padding:0.3rem 0.8rem;background:rgba(255,209,102,0.15);border:1px solid rgba(255,209,102,0.3);color:var(--gold)" onclick="openBulkRename()">✏️ Bulk Rename</button>
       </div>
+      <span style="font-size:0.8rem;color:var(--muted);display:block;margin-bottom:0.75rem" id="history-count"></span>
       <div id="history-list">
         <div class="empty"><div class="emoji">📭</div><p>Nothing logged yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT DEBT MODAL -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <h3>✏️ Edit Debt</h3>
+      <div class="form-row" style="margin-bottom:0.75rem">
+        <div class="form-group">
+          <label>Who owes?</label>
+          <input type="text" id="edit-from" list="people-list" />
+        </div>
+        <div class="form-group">
+          <label>Who to?</label>
+          <input type="text" id="edit-to" list="people-list" />
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Drink</label>
+        <input type="text" id="edit-drink" list="drinks-list-data" />
+        <datalist id="drinks-list-data"></datalist>
+      </div>
+      <div class="form-row" style="margin-bottom:0.75rem">
+        <div class="form-group">
+          <label>Quantity</label>
+          <input type="number" id="edit-qty" min="1" value="1" />
+        </div>
+        <div class="form-group">
+          <label>Reason</label>
+          <input type="text" id="edit-reason" list="reasons-list-data" />
+          <datalist id="reasons-list-data"></datalist>
+        </div>
+      </div>
+      <input type="hidden" id="edit-index" />
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1;margin:0" onclick="saveEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK RENAME MODAL -->
+  <div class="modal-overlay" id="bulk-modal">
+    <div class="modal">
+      <h3>✏️ Bulk Rename</h3>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">Fix a misspelled name across all debts at once.</p>
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Find name</label>
+        <input type="text" id="bulk-find" placeholder="e.g. Phill" list="people-list" />
+      </div>
+      <div class="form-group" style="margin-bottom:0.75rem">
+        <label>Replace with</label>
+        <input type="text" id="bulk-replace" placeholder="e.g. Phil" />
+      </div>
+      <div id="bulk-preview" style="font-size:0.82rem;color:var(--muted);margin-bottom:0.75rem"></div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeBulkModal()">Cancel</button>
+        <button class="btn btn-primary" style="flex:1;margin:0" onclick="confirmBulkRename()">Rename All</button>
       </div>
     </div>
   </div>
@@ -1112,6 +1172,7 @@ function renderHistory() {
           <strong>${d.from}</strong> owes <strong>${d.to}</strong>
           <div class="debt-meta">${d.qty}× ${d.drink} · ${date}${d.reason ? ` · 💬 "${d.reason}"` : ''}</div>
         </div>
+        <button class="btn" style="font-size:0.8rem;padding:0.3rem 0.6rem;background:rgba(255,209,102,0.1);border:1px solid rgba(255,209,102,0.2);color:var(--gold);margin-right:0.25rem" onclick="openEditModal(${realIndex})">✏️</button>
         <button class="btn btn-danger" onclick="removeDebt(${realIndex})">✕</button>
       </div>`;
   }).join('');
@@ -1386,6 +1447,87 @@ function showTab(name) {
     if (b.getAttribute('onclick').includes(name)) b.classList.add('active');
   });
   if (name === 'add') { renderDrinkChips(); renderReasonChips(); }
+}
+
+// ═══════════════════════════════════════════════
+//  EDIT & BULK RENAME
+// ═══════════════════════════════════════════════
+function openEditModal(index) {
+  const d = state.debts[index];
+  document.getElementById('edit-from').value = d.from;
+  document.getElementById('edit-to').value = d.to;
+  document.getElementById('edit-drink').value = d.drink;
+  document.getElementById('edit-qty').value = d.qty;
+  document.getElementById('edit-reason').value = d.reason || '';
+  document.getElementById('edit-index').value = index;
+  // Populate datalists
+  document.getElementById('drinks-list-data').innerHTML = state.drinks.map(x => `<option value="${x.name}">`).join('');
+  document.getElementById('reasons-list-data').innerHTML = state.reasons.map(r => `<option value="${r}">`).join('');
+  document.getElementById('edit-modal').classList.add('open');
+}
+
+function closeEditModal() {
+  document.getElementById('edit-modal').classList.remove('open');
+}
+
+async function saveEdit() {
+  const index = parseInt(document.getElementById('edit-index').value);
+  const from = document.getElementById('edit-from').value.trim();
+  const to = document.getElementById('edit-to').value.trim();
+  const drink = document.getElementById('edit-drink').value.trim();
+  const qty = parseInt(document.getElementById('edit-qty').value) || 1;
+  const reason = document.getElementById('edit-reason').value.trim();
+
+  if (!from || !to || !drink) return toast('Fill in all fields!');
+  if (from.toLowerCase() === to.toLowerCase()) return toast('Can\'t owe yourself!');
+
+  state.debts[index] = { ...state.debts[index], from, to, drink, qty, reason };
+  closeEditModal();
+  renderAll();
+  await saveToGitHub();
+  toast('✏️ Debt updated!');
+}
+
+function openBulkRename() {
+  document.getElementById('bulk-find').value = '';
+  document.getElementById('bulk-replace').value = '';
+  document.getElementById('bulk-preview').textContent = '';
+  document.getElementById('bulk-modal').classList.add('open');
+  document.getElementById('bulk-find').addEventListener('input', updateBulkPreview);
+}
+
+function updateBulkPreview() {
+  const find = document.getElementById('bulk-find').value.trim();
+  if (!find) { document.getElementById('bulk-preview').textContent = ''; return; }
+  const matches = state.debts.filter(d =>
+    d.from.toLowerCase() === find.toLowerCase() || d.to.toLowerCase() === find.toLowerCase()
+  ).length;
+  document.getElementById('bulk-preview').textContent = matches > 0
+    ? `Found "${find}" in ${matches} debt${matches !== 1 ? 's' : ''}`
+    : `No debts found with "${find}"`;
+}
+
+function closeBulkModal() {
+  document.getElementById('bulk-modal').classList.remove('open');
+}
+
+async function confirmBulkRename() {
+  const find = document.getElementById('bulk-find').value.trim();
+  const replace = document.getElementById('bulk-replace').value.trim();
+  if (!find || !replace) return toast('Fill in both fields!');
+
+  let count = 0;
+  state.debts.forEach(d => {
+    if (d.from.toLowerCase() === find.toLowerCase()) { d.from = replace; count++; }
+    if (d.to.toLowerCase() === find.toLowerCase()) { d.to = replace; count++; }
+  });
+
+  if (count === 0) return toast(`No matches found for "${find}"`);
+
+  closeBulkModal();
+  renderAll();
+  await saveToGitHub();
+  toast(`✏️ Renamed ${count} instance${count !== 1 ? 's' : ''} of "${find}" → "${replace}"`);
 }
 
 function showPasswordScreen() {
