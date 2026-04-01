@@ -12,11 +12,17 @@ A lightweight internal tool for tracking drink debts between teammates — becau
 Pour Decisions lets coworkers give and request drinks, log the reason why, and tracks who owes what over time.
 
 - **Log a debt** — "Phil owes Sarah 2 Espresso Martinis · Lost the bet"
-- **Leaderboard** — ranked view of who owes the most drinks overall
-- **Reason tracking** — see which projects or moments have racked up the most tabs
-- **Full history** — every debt logged with timestamp, drink type, and reason
-- **Custom menu** — add your own drinks and reasons beyond the defaults
-- **Multi-person debts** — log to multiple people in one entry
+- **Multi-person debts** — log to multiple people in one entry (same drink/qty to each)
+- **Leaderboard** — ranked view of who owes the most drinks overall, with directional arrows showing exactly who owes who
+- **Personal Tab** — top 5 biggest debtors and most owed-to, fully netted across all debts
+- **My Tab** — pick any person from a dropdown to see exactly who they owe and who owes them, broken down by drink
+- **Settle debts** — log full or partial settlements; history stays intact, net balances update automatically
+- **🦁 A Lannister Always Pays His Debts** — top 5 settlers ranked by total drinks paid back
+- **Drink breakdown** — donut chart showing which drink types are driving the most debt
+- **Reason tracking** — pre-set reusable reasons (projects, bets, mistakes); see which reasons have racked up the most tabs
+- **Full history** — every debt and settlement logged with timestamp, drink type, and reason; debts and settlements visually distinct
+- **Edit & bulk rename** — edit any individual debt, or fix a misspelled name across all debts in one shot
+- **Custom menu** — add your own drinks (with emoji) and reasons beyond the defaults
 - **Slack notifications** — posts to a team channel when a new debt is logged
 
 10+ colleagues at [Beyond](https://www.beyond.com) actively use this.
@@ -49,7 +55,10 @@ No build step, no framework, no dependencies to manage. Pure HTML, CSS, and vani
 *Tradeoff: As features grow, this will become harder to maintain. A component framework would be the next step.*
 
 **Net debt calculation**
-The leaderboard shows net balances — if Phil owes Sarah 3 drinks but Sarah owes Phil 1, it shows Phil owes Sarah 2. This keeps the view clean and avoids double-counting favors.
+The leaderboard shows net balances — if Phil owes Sarah 3 drinks but Sarah owes Phil 1, it shows Phil owes Sarah 2. Settlements are logged separately (preserving history) and factored into all net calculations automatically.
+
+**Settlements as first-class entries**
+Rather than deleting or modifying debt records when someone pays back, settlements are stored as separate entries. This preserves the full audit trail while keeping net balances accurate everywhere — leaderboard, My Tab, and the Lannister board all reflect settlements in real time.
 
 ---
 
@@ -59,6 +68,7 @@ The leaderboard shows net balances — if Phil owes Sarah 3 drinks but Sarah owe
 - **Internal tools ship when they solve real problems.** This got adopted because it fit an actual behavior my team already had — not because I promoted it.
 - **Design matters even for internal tools.** I spent real time on the UI (dark theme, drink emojis, leaderboard medals) because people are more likely to use something that feels good. Colleagues noticed.
 - **Single-file apps have real limits.** The code works but is already getting long. My next project used a proper framework from the start.
+- **Features compound.** What started as a simple debt logger now has settlements, personal views, bulk editing, a donut chart, and a Lannister board. Each feature was cheap to add individually — but the codebase complexity added up. Worth thinking about architecture earlier.
 
 ---
 
@@ -72,6 +82,7 @@ The leaderboard shows net balances — if Phil owes Sarah 3 drinks but Sarah owe
 | Database | GitHub API (JSON file as data store) |
 | Hosting | Vercel |
 | Auth | Shared password + localStorage |
+| Notifications | Slack Incoming Webhooks |
 
 ---
 
@@ -84,7 +95,7 @@ cd pour-decisions
 # Create a .env.local file with:
 # GITHUB_TOKEN=your_github_token
 # GITHUB_OWNER=your_github_username
-# GITHUB_REPO=pour-decisions
+# GITHUB_REPO=pour-decisions-data
 # APP_PASSWORD=your_app_password
 # SLACK_WEBHOOK_URL=your_slack_webhook (optional)
 
